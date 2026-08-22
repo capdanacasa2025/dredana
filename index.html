@@ -3599,8 +3599,43 @@ function doLogin() {
       errEl.style.display = 'block';
       return;
     }
-    await loadPerfis();
-    const perfil = USERS.find(x => x.user === email);
+    // Busca os perfis. Diferencia três situações que antes davam todas a
+    // mesma mensagem genérica: (a) a consulta em si falhou (tabela ausente,
+    // RLS bloqueando, cache de schema da API desatualizado), (b) a tabela
+    // está vazia — instalação nova, ninguém cadastrado ainda, e (c) a
+    // tabela tem perfis, mas nenhum com este e-mail.
+    const rows = await sbFetch('perfis', 'GET', null, '?select=*&order=nome');
+    if (rows === null) {
+      errEl.textContent = 'Login válido, mas não foi possível ler a tabela de perfis no banco.' + sbErroDetalhe();
+      errEl.style.display = 'block';
+      await supabaseAuthLogout();
+      return;
+    }
+    USERS = rows.map(r => ({ ...r, user: r.email }));
+
+    // Comparação tolerante a maiúsculas/minúsculas e espaços — o e-mail
+    // cadastrado na tabela e o digitado no login nem sempre vêm idênticos.
+    const alvo = email.trim().toLowerCase();
+    let perfil = USERS.find(x => (x.user || '').trim().toLowerCase() === alvo);
+
+    // Primeiro acesso de uma instalação nova: a tabela `perfis` está vazia,
+    // então não existe nenhum admin para cadastrar ninguém — o sistema
+    // ficaria travado. Como a conta de login só pode ter sido criada
+    // manualmente no painel do Supabase, quem chega aqui já é autorizado:
+    // criamos o primeiro perfil como admin automaticamente.
+    if (!perfil && USERS.length === 0) {
+      const novo = { id: uid(), email, nome: email.split('@')[0], role: 'admin', pages: [] };
+      const ok = await sbFetch('perfis', 'POST', novo);
+      if (!ok) {
+        errEl.textContent = 'Login válido, mas não foi possível criar o primeiro perfil admin.' + sbErroDetalhe();
+        errEl.style.display = 'block';
+        await supabaseAuthLogout();
+        return;
+      }
+      perfil = { ...novo, user: novo.email };
+      USERS = [perfil];
+    }
+
     if (!perfil) {
       errEl.textContent = 'Login válido, mas seu perfil ainda não foi cadastrado na tela de Usuários. Peça para o admin cadastrar seu e-mail lá.';
       errEl.style.display = 'block';
