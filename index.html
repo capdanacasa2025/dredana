@@ -804,6 +804,10 @@ th.ef-th { padding:8px 8px 8px 12px; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           Análise por Subcategoria
         </div>
+        <div class="nav-sub-item" onclick="showPage('metas-categoria')" id="nav-metas-categoria">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          Metas por Categoria
+        </div>
       </div>
 
       <!-- Admin -->
@@ -916,7 +920,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
     <!-- ══ LANÇAMENTOS ══ -->
     <div class="page" id="page-lancamentos">
       <div class="page-header">
-        <div><div class="page-title">Lançamentos</div><div class="page-sub" style="margin-bottom:0">Registro de compras de produtos</div></div>
+        <div><div class="page-title">Lançamentos — Contas a Pagar</div><div class="page-sub" style="margin-bottom:0">Registro de compras de produtos</div></div>
         <button class="btn-pdf" onclick="imprimirPagina('lancamentos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> PDF</button>
         <button class="btn btn-secondary" onclick="abrirModalCategoriaMassa('lancamentos')">🏷️ Categoria em Massa</button>
         <button class="btn btn-secondary" onclick="abrirModalImport('pagar')">📥 Importar Extrato</button>
@@ -1670,7 +1674,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
             <select id="dfc-lan-cat" onchange="onCategoriaChangeUsuario('dfc-lan-cat','dfc-lan-subcat')"><option value="">Selecione...</option></select>
           </div>
           <div class="form-group"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label>
-            <select id="dfc-lan-subcat"><option value="">Nenhuma</option></select>
+            <select id="dfc-lan-subcat" onchange="onSubcategoriaChange('dfc-lan-cat','dfc-lan-subcat')"><option value="">Nenhuma</option></select>
           </div>
           <div class="form-group"><label>Valor (R$) *</label><input id="dfc-lan-valor" type="number" step="0.01" placeholder="0,00" /></div>
         </div>
@@ -1986,6 +1990,37 @@ th.ef-th { padding:8px 8px 8px 12px; }
     </div>
 
 
+    <!-- ══ METAS MENSAIS POR CATEGORIA ══ -->
+    <div class="page" id="page-metas-categoria">
+      <div class="page-header">
+        <div><div class="page-title">Metas Mensais por Categoria</div><div class="page-sub" style="margin-bottom:0">Defina o valor-alvo de cada mês para uma categoria e acompanhe o realizado contra a meta.</div></div>
+      </div>
+
+      <div class="card" style="padding:14px 20px;margin-bottom:16px;">
+        <div class="filter-row">
+          <div class="form-group"><label>Categoria</label>
+            <select id="mc-cat" onchange="renderMetasCategoria()" style="min-width:240px;">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Ano</label>
+            <select id="mc-ano" onchange="renderMetasCategoria()" style="width:120px;"></select>
+          </div>
+          <div style="align-self:flex-end;display:flex;gap:8px;">
+            <button class="btn btn-primary" onclick="salvarMetasCategoria()">Salvar Metas</button>
+            <button class="btn btn-secondary" onclick="limparMetasCategoria()">Limpar Ano</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="overflow-x:auto;">
+        <div class="card-title">Meta x Realizado</div>
+        <div id="mc-tabela-wrap">
+          <div class="empty-state" style="padding:32px">Selecione uma categoria para definir as metas.</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ══ BANCOS / CAIXAS ══ -->
     <div class="page" id="page-bancos">
       <div class="page-header">
@@ -2147,7 +2182,10 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px;">
           <div class="card-title" style="margin:0;">🎯 Metas do Mês <span id="metas-gauge-periodo" style="font-weight:400;color:#a8a29e;font-size:12px;"></span></div>
-          <button class="btn btn-secondary" style="padding:6px 14px;font-size:12px;" onclick="abrirModalMetasDre()">⚙️ Definir Metas</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-secondary" style="padding:6px 14px;font-size:12px;" onclick="abrirModalGauges()">👁️ Medidores</button>
+            <button class="btn btn-secondary" style="padding:6px 14px;font-size:12px;" onclick="abrirModalMetasDre()">⚙️ Definir Metas</button>
+          </div>
         </div>
         <div id="dash-metas-gauges" style="display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;padding-bottom:4px;"></div>
       </div>
@@ -2178,6 +2216,18 @@ th.ef-th { padding:8px 8px 8px 12px; }
             <label style="margin:0;font-size:12px;white-space:nowrap;">Produto (Compras e A Pagar)</label>
             <select id="dash-prod" onchange="renderDashCharts();" style="width:170px;">
               <option value="">Todos</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label style="margin:0;font-size:12px;white-space:nowrap;">Categoria</label>
+            <select id="dash-cat" onchange="popularDashSubcat(); renderDashCharts();" style="width:170px;">
+              <option value="">Todas</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label style="margin:0;font-size:12px;white-space:nowrap;">Subcategoria</label>
+            <select id="dash-subcat" onchange="renderDashCharts();" style="width:170px;">
+              <option value="">Todas</option>
             </select>
           </div>
         </div>
@@ -2321,7 +2371,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Valor Total (R$) *</label><input id="l-valor" type="number" step="0.01" placeholder="0,00" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','l-catdre')">+</button></label><select id="l-catdre" onchange="onCategoriaChangeUsuario('l-catdre','l-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="l-subcat"><option value="">Nenhuma</option></select></div>
+      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','l-catdre')">+</button></label><select id="l-catdre" onchange="onCategoriaChangeUsuario('l-catdre','l-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="l-subcat" onchange="onSubcategoriaChange('l-catdre','l-subcat')"><option value="">Nenhuma</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group">
@@ -2411,7 +2461,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Valor Total (R$) *</label><input id="lr-valor" type="number" step="0.01" placeholder="0,00" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','lr-catdre')">+</button></label><select id="lr-catdre" onchange="onCategoriaChangeUsuario('lr-catdre','lr-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="lr-subcat"><option value="">Nenhuma</option></select></div>
+      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','lr-catdre')">+</button></label><select id="lr-catdre"><option value="">Nenhuma</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group"><label>Número de Parcelas</label>
@@ -2565,7 +2615,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Valor Total</label><input id="elr-valor" type="number" step="0.01" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','elr-catdre')">+</button></label><select id="elr-catdre" onchange="onCategoriaChangeUsuario('elr-catdre','elr-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="elr-subcat"><option value="">Nenhuma</option></select></div>
+      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','elr-catdre')">+</button></label><select id="elr-catdre"><option value="">Nenhuma</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group"><label>Parcelas</label>
@@ -2823,6 +2873,25 @@ th.ef-th { padding:8px 8px 8px 12px; }
      form-bnk, form-empresa): o painel é movido para dentro deste modal ao
      abrir e devolvido ao lugar original ao fechar. Assim o cadastro vira uma
      janela, sem duplicar campos nem quebrar os ids usados pelo JS. -->
+<!-- ══ MODAL: ESCOLHER MEDIDORES VISÍVEIS ══ -->
+<div class="modal-overlay" id="modal-gauges">
+  <div class="modal" style="width:460px;max-width:94vw;">
+    <div class="modal-title">👁️ Medidores visíveis</div>
+    <div style="font-size:12px;color:#a8a29e;margin-bottom:14px;">
+      Marque quais velocímetros aparecem em “Metas do Mês”. A escolha fica salva neste navegador.
+    </div>
+    <div id="gauges-lista" style="display:flex;flex-direction:column;gap:2px;"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button class="btn btn-secondary btn-sm" onclick="marcarTodosGauges(true)">Marcar todos</button>
+      <button class="btn btn-secondary btn-sm" onclick="marcarTodosGauges(false)">Desmarcar todos</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-gauges')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarGaugesVisiveis()">Aplicar</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-form-generico">
   <div class="modal" style="width:760px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
@@ -2876,7 +2945,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Valor Total</label><input id="edit-valor" type="number" step="0.01" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','edit-catdre')">+</button></label><select id="edit-catdre" onchange="onCategoriaChangeUsuario('edit-catdre','edit-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="edit-subcat"><option value="">Nenhuma</option></select></div>
+      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','edit-catdre')">+</button></label><select id="edit-catdre" onchange="onCategoriaChangeUsuario('edit-catdre','edit-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="edit-subcat" onchange="onSubcategoriaChange('edit-catdre','edit-subcat')"><option value="">Nenhuma</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group"><label>Parcelas</label>
@@ -3256,6 +3325,7 @@ const PAGES_CONFIG = [
   { id:'dre-demonstrativo', label:'DRE Demonstrativo',   grupo:'dre'     },
   { id:'dre-analise-cat',   label:'DRE Análise por Categoria', grupo:'dre' },
   { id:'dre-analise-subcat',label:'DRE Análise por Subcategoria', grupo:'dre' },
+  { id:'metas-categoria',   label:'Metas por Categoria', grupo:'dre' },
 ];
 
 // ══════════════════════════════════════════
@@ -3866,7 +3936,7 @@ function showPage(p) {
   if(pg) pg.classList.add('active');
   if (typeof event !== 'undefined' && event && event.currentTarget) event.currentTarget.classList.add('active');
   _paginaAtual = p;
-  if (p === 'dashboard')    { renderFraseDoDia(); carregarDreMetas().then(carregarVarEstoque).then(carregarDreGrupoClasses).then(renderDashboard); setTimeout(loadMetaInputs, 100); }
+  if (p === 'dashboard')    { renderFraseDoDia(); popularDashCat(); carregarDreMetas().then(carregarVarEstoque).then(carregarDreGrupoClasses).then(renderDashboard); setTimeout(loadMetaInputs, 100); }
   if (p === 'lancamentos')    renderLancamentos();
   if (p === 'apagar')         renderApagar();
   if (p === 'pagas')          renderPagas();
@@ -3890,6 +3960,7 @@ function showPage(p) {
   if (p === 'dre-demonstrativo') { carregarVarEstoque().then(carregarDreGrupoClasses).then(renderDre); }
   if (p === 'dre-analise-cat')   { popularCategoriasAnalise(); renderAnaliseCategoria(); }
   if (p === 'dre-analise-subcat'){ popularCategoriasAnaliseSub(); renderAnaliseSubcategoria(); }
+  if (p === 'metas-categoria')   { carregarMetasCategoria().then(abrirMetasCategoria); }
   if (p === 'usuarios')          renderUsuariosAdmin();
   if (p === 'empresas')          renderEmpresas();
 }
@@ -3903,7 +3974,7 @@ function renderPaginaAtual() {
   const pg = document.getElementById('page-' + p);
   if (pg) pg.classList.add('active');
   if (nav) nav.classList.add('active');
-  if (p === 'dashboard')    { renderFraseDoDia(); carregarDreMetas().then(carregarVarEstoque).then(carregarDreGrupoClasses).then(renderDashboard); setTimeout(loadMetaInputs, 100); }
+  if (p === 'dashboard')    { renderFraseDoDia(); popularDashCat(); carregarDreMetas().then(carregarVarEstoque).then(carregarDreGrupoClasses).then(renderDashboard); setTimeout(loadMetaInputs, 100); }
   if (p === 'lancamentos')    renderLancamentos();
   if (p === 'apagar')         renderApagar();
   if (p === 'pagas')          renderPagas();
@@ -3927,6 +3998,7 @@ function renderPaginaAtual() {
   if (p === 'dre-demonstrativo') { carregarVarEstoque().then(carregarDreGrupoClasses).then(renderDre); }
   if (p === 'dre-analise-cat')   { popularCategoriasAnalise(); renderAnaliseCategoria(); }
   if (p === 'dre-analise-subcat'){ popularCategoriasAnaliseSub(); renderAnaliseSubcategoria(); }
+  if (p === 'metas-categoria')   { carregarMetasCategoria().then(abrirMetasCategoria); }
   if (p === 'usuarios')          renderUsuariosAdmin();
   if (p === 'empresas')          renderEmpresas();
 }
@@ -4090,6 +4162,33 @@ function populateProdSelects() {
     const el = document.getElementById(id);
     if(el) el.innerHTML = filterOpts;
   });
+}
+
+// Filtros de Categoria/Subcategoria do gráfico do Dashboard
+function popularDashCat() {
+  const el = document.getElementById('dash-cat');
+  if (!el) return;
+  const val = el.value;
+  const cats = [...db.dfc_cats].sort((a,b) => (a.nome||'').localeCompare(b.nome||''));
+  el.innerHTML = '<option value="">Todas</option>' +
+    cats.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+  if (val && cats.some(c => c.id === val)) el.value = val;
+  popularDashSubcat();
+}
+
+// A lista de subcategorias segue a categoria escolhida. Sem categoria
+// selecionada, mostra todas para permitir filtrar direto por subcategoria.
+function popularDashSubcat() {
+  const el = document.getElementById('dash-subcat');
+  if (!el) return;
+  const val = el.value;
+  const catSel = (document.getElementById('dash-cat')||{}).value || '';
+  const lista = catSel
+    ? subcatsDaCategoria(catSel)
+    : [...db.dfc_subcats].sort((a,b) => (a.nome||'').localeCompare(b.nome||''));
+  el.innerHTML = '<option value="">Todas</option>' +
+    lista.map(sc => `<option value="${sc.id}">${catSel ? sc.nome : getDfcCatNome(sc.cat) + ' → ' + sc.nome}</option>`).join('');
+  if (val && lista.some(sc => sc.id === val)) el.value = val; else el.value = '';
 }
 
 // ══════════════════════════════════════════
@@ -5069,7 +5168,7 @@ function editLancamento(id) {
   onCategoriaChange('edit-catdre','edit-subcat');
   const esc = document.getElementById('edit-subcat');
   if (esc) esc.value = l.subcat || '';
-  resetAvisoSubcat('edit-subcat');
+  onSubcategoriaChange('edit-catdre','edit-subcat');
   // Populate manual parcela dates if present
   if (l.parcelas > 1) {
     toggleParcelaDates('edit-parcelas', 'edit-parcela-dates');
@@ -5173,6 +5272,7 @@ function _buildParcelas() {
         tipoPag: l.tipo_pag || '',
         juros: l.juros ?? null,
         catId,
+        subcat: l.subcat || '',
         parcIdx: i,
         totalParc: n,
         isPago
@@ -7152,6 +7252,64 @@ function speedometerSVG(valFrac, metaFrac, cor, centerText) {
 // Renderiza os 8 velocímetros (Venda, CPV, Margem, Lucro + as 4 Despesas
 // do CPSV) numa única linha. Venda e as 4 Despesas do CPSV = valor em R$.
 // CPV, Margem e Lucro = percentual do DRE (sobre a Receita).
+// ══════════════════════════════════════════════════════════════════
+// MEDIDORES VISÍVEIS — o usuário escolhe quais velocímetros aparecem
+// em "Metas do Mês". A preferência é por navegador (localStorage), não
+// vai para o banco: é ajuste de visualização, não dado do cliente.
+// ══════════════════════════════════════════════════════════════════
+const GAUGES_KEY = '477_gauges_visiveis';
+const GAUGES_DISPONIVEIS = [
+  { key:'venda',       label:'Venda (R$)' },
+  { key:'cpv',         label:'CPV (%)' },
+  { key:'mc',          label:'Margem de Contribuição (%)' },
+  { key:'lucro',       label:'Lucro Líquido (%)' },
+  { key:'desp_prod',   label:'Despesas c/ Produtos' },
+  { key:'desp_insumo', label:'Despesas c/ Insumos' },
+  { key:'desp_rh',     label:'Despesas c/ RH' },
+  { key:'desp_manut',  label:'Despesas c/ Manutenções' }
+];
+
+// Sem preferência salva, mostra todos (comportamento de antes).
+function getGaugesVisiveis() {
+  try {
+    const raw = localStorage.getItem(GAUGES_KEY);
+    if (!raw) return GAUGES_DISPONIVEIS.map(g => g.key);
+    const lista = JSON.parse(raw);
+    if (!Array.isArray(lista)) return GAUGES_DISPONIVEIS.map(g => g.key);
+    // Ignora chaves desconhecidas (ex.: preferência antiga de outra versão)
+    return lista.filter(k => GAUGES_DISPONIVEIS.some(g => g.key === k));
+  } catch(e) { return GAUGES_DISPONIVEIS.map(g => g.key); }
+}
+
+function abrirModalGauges() {
+  const visiveis = getGaugesVisiveis();
+  const lista = document.getElementById('gauges-lista');
+  if (lista) {
+    lista.innerHTML = GAUGES_DISPONIVEIS.map(g => `
+      <label style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;cursor:pointer;font-size:13px;">
+        <input type="checkbox" id="gauge-chk-${g.key}" ${visiveis.includes(g.key) ? 'checked' : ''} style="width:15px;height:15px;cursor:pointer;" />
+        ${g.label}
+      </label>`).join('');
+  }
+  openModal('modal-gauges');
+}
+
+function marcarTodosGauges(marcar) {
+  GAUGES_DISPONIVEIS.forEach(g => {
+    const chk = document.getElementById('gauge-chk-' + g.key);
+    if (chk) chk.checked = !!marcar;
+  });
+}
+
+function salvarGaugesVisiveis() {
+  const escolhidos = GAUGES_DISPONIVEIS
+    .filter(g => { const chk = document.getElementById('gauge-chk-' + g.key); return chk && chk.checked; })
+    .map(g => g.key);
+  localStorage.setItem(GAUGES_KEY, JSON.stringify(escolhidos));
+  closeModal('modal-gauges');
+  renderMetasGauges();
+}
+
 function renderMetasGauges() {
   const wrap = document.getElementById('dash-metas-gauges');
   if (!wrap) return;
@@ -7187,7 +7345,10 @@ function renderMetasGauges() {
     return n ? s/n : 0;
   };
 
+  // Só monta os medidores que o usuário deixou marcados em "Medidores".
+  const visiveis = getGaugesVisiveis();
   const cards = [];
+  const pushCard = (key, html) => { if (visiveis.includes(key)) cards.push(html); };
 
   // 1) VENDA — R$
   {
@@ -7196,7 +7357,7 @@ function renderMetasGauges() {
     const max = Math.max(meta*1.25, vendaReal*1.1, 1);
     const pctMeta = meta>0 ? (vendaReal/meta*100) : 0;
     const centro = meta>0 ? `${Math.round(pctMeta)}%` : '—';
-    cards.push(cardGauge('Venda',
+    pushCard('venda', cardGauge('Venda',
       meta>0 ? speedometerSVG(vendaReal/max, meta/max, cor, centro) : gaugeVazio(),
       fmtBRL(vendaReal), meta>0?('meta: '+fmtBRL(meta)):'meta: <span style="color:#d6d3d1">sem meta</span>',
       'meta é piso (quanto maior, melhor)'));
@@ -7207,7 +7368,7 @@ function renderMetasGauges() {
     const meta = metaPctMedia('cpv');
     const cor = meta>0 ? (rpct<=meta ? '#16a34a' : '#dc2626') : '#d6d3d1';
     const max = Math.max(meta*1.6, rpct*1.15, 100);
-    cards.push(cardGauge('CPV (%)',
+    pushCard('cpv', cardGauge('CPV (%)',
       meta>0 ? speedometerSVG(rpct/max, meta/max, cor, rpct.toFixed(1)+'%') : gaugeVazioPct(rpct),
       rpct.toFixed(1)+'%', meta>0?('meta: '+meta.toFixed(1)+'%'):'meta: <span style="color:#d6d3d1">sem meta</span>',
       'meta é teto (quanto menor, melhor)'));
@@ -7218,7 +7379,7 @@ function renderMetasGauges() {
     const meta = metaPctMedia('mc');
     const cor = meta>0 ? (rpct>=meta ? '#16a34a' : '#d97706') : '#d6d3d1';
     const max = Math.max(meta*1.5, rpct*1.15, 100);
-    cards.push(cardGauge('Margem de Contribuição (%)',
+    pushCard('mc', cardGauge('Margem de Contribuição (%)',
       meta>0 ? speedometerSVG(rpct/max, meta/max, cor, rpct.toFixed(1)+'%') : gaugeVazioPct(rpct),
       rpct.toFixed(1)+'%', meta>0?('meta: '+meta.toFixed(1)+'%'):'meta: <span style="color:#d6d3d1">sem meta</span>',
       'meta é piso (quanto maior, melhor)'));
@@ -7229,7 +7390,7 @@ function renderMetasGauges() {
     const meta = metaPctMedia('lucro');
     const cor = meta>0 ? (rpct>=meta ? '#16a34a' : '#d97706') : '#d6d3d1';
     const max = Math.max(meta*1.8, Math.abs(rpct)*1.2, 50);
-    cards.push(cardGauge('Lucro Líquido (%)',
+    pushCard('lucro', cardGauge('Lucro Líquido (%)',
       meta>0 ? speedometerSVG(rpct/max, meta/max, cor, rpct.toFixed(1)+'%') : gaugeVazioPct(rpct),
       rpct.toFixed(1)+'%', meta>0?('meta: '+meta.toFixed(1)+'%'):'meta: <span style="color:#d6d3d1">sem meta</span>',
       'meta é piso (quanto maior, melhor)'));
@@ -7243,14 +7404,16 @@ function renderMetasGauges() {
       const meta = metaDe(mt.key);
       const cor = meta>0 ? (realVal<=meta ? '#16a34a' : '#dc2626') : '#d6d3d1';
       const max = Math.max(meta*1.6, realVal*1.15, 1);
-      cards.push(cardGauge(mt.titulo,
+      pushCard(mt.key, cardGauge(mt.titulo,
         meta>0 ? speedometerSVG(realVal/max, meta/max, cor, fmtBRLCompacto(realVal)) : gaugeVazio(),
         fmtBRL(realVal), meta>0?('meta: '+fmtBRL(meta)):'meta: <span style="color:#d6d3d1">sem meta</span>',
         'meta é teto (quanto menor, melhor)'));
     });
   }
 
-  wrap.innerHTML = cards.join('');
+  wrap.innerHTML = cards.length
+    ? cards.join('')
+    : '<div class="empty-state" style="padding:20px;flex:1">Nenhum medidor selecionado. Use o botão <b>Medidores</b> para escolher quais exibir.</div>';
 }
 function cardGauge(titulo, svg, valorTxt, metaTxt, dica) {
   return `<div style="background:#fff;border:1px solid #f5f4f2;border-radius:12px;padding:8px 6px;text-align:center;flex:1 1 128px;min-width:118px;max-width:150px;">
@@ -7364,10 +7527,17 @@ function renderDashCharts() {
 
   // Dados de Compras por mês (agrupado pela data da compra), com filtro opcional de Produto
   const prodFiltro = document.getElementById('dash-prod') ? document.getElementById('dash-prod').value : '';
+  // Filtros de Categoria/Subcategoria — valem para Compras, A Pagar e A Receber.
+  const catFiltro    = document.getElementById('dash-cat')    ? document.getElementById('dash-cat').value    : '';
+  const subcatFiltro = document.getElementById('dash-subcat') ? document.getElementById('dash-subcat').value : '';
+  // Categoria efetiva de um lançamento: a marcada nele ou, na falta, a do produto.
+  const _catDe = (l, listaProd) => l.cat_dre || ((listaProd.find(x => x.id === l.prod)||{}).cat) || '';
   const comprasMes = Array(12).fill(0);
   db.lancamentos.forEach(l => {
     if(!l.dtcompra) return;
     if(prodFiltro && l.prod !== prodFiltro) return;
+    if(catFiltro && _catDe(l, db.produtos) !== catFiltro) return;
+    if(subcatFiltro && (l.subcat||'') !== subcatFiltro) return;
     const parts = l.dtcompra.split('-');
     const ly = parseInt(parts[0]), lm = parseInt(parts[1]);
     if(ly !== ano) return;
@@ -7382,6 +7552,8 @@ function renderDashCharts() {
   const vencidasMes = Array(12).fill(0);
   getParcelas(false).forEach(p => {
     if(prodFiltro && p.prod !== prodFiltro) return;
+    if(catFiltro && (p.catId||'') !== catFiltro) return;
+    if(subcatFiltro && (p.subcat||'') !== subcatFiltro) return;
     const d = p.venc || p.dtcompra;
     if(!d) return;
     const parts = d.split('-');
@@ -7396,6 +7568,10 @@ function renderDashCharts() {
   // aqui pois o catálogo de produtos de venda é diferente do de compras.
   const aReceberMes = Array(12).fill(0);
   getParcelasReceber(false).forEach(p => {
+    // Contas a Receber não tem subcategoria: se o filtro de subcategoria
+    // estiver ativo, a série "A Receber" não se aplica e fica zerada.
+    if(subcatFiltro) return;
+    if(catFiltro && (p.catId||'') !== catFiltro) return;
     const d = p.venc || p.dtvenda;
     if(!d) return;
     const parts = d.split('-');
@@ -7463,7 +7639,13 @@ function renderDashCharts() {
   const pagarMax = Math.max(1, ...aPagarMes, ...vencidasMes, ...aReceberMes);
   chartCfg('chart-pagar', pagarDatasets, 'bar', true, pagarMax * 1.12);
   const pagarSub = document.getElementById('chart-pagar-subtitulo');
-  if (pagarSub) pagarSub.textContent = prodFiltro ? `Produto (Pagar/Compras): ${prodLabel} — A Receber não é filtrado por produto` : '';
+  if (pagarSub) {
+    const partes = [];
+    if (prodFiltro)    partes.push(`Produto (Pagar/Compras): ${prodLabel} — A Receber não é filtrado por produto`);
+    if (catFiltro)     partes.push(`Categoria: ${getDfcCatNome(catFiltro)}`);
+    if (subcatFiltro)  partes.push(`Subcategoria: ${getDfcSubNome(subcatFiltro)} — A Receber não usa subcategoria, por isso fica zerado`);
+    pagarSub.textContent = partes.join('  •  ');
+  }
 
   renderGraficosFormas(ano, mesFiltro);
 }
@@ -8324,7 +8506,6 @@ async function saveLancReceber() {
   const cliente=document.getElementById('lr-cliente').value;
   const valor=parseFloat(document.getElementById('lr-valor').value);
   if(!dtvenda||!cliente||!valor){ alert('Preencha data, cliente e valor.'); return; }
-  if (!validarSubcategoria('lr-catdre','lr-subcat')) return;
   const recebido=document.getElementById('lr-recebido').value;
   const banco=document.getElementById('lr-banco').value;
   if (!validarBancoObrigatorio(recebido, banco)) return;
@@ -8341,7 +8522,6 @@ async function saveLancReceber() {
     tipo_pag:document.getElementById('lr-tipo-pag').value,
     banco,
     cat_dre: document.getElementById('lr-catdre') ? document.getElementById('lr-catdre').value : '',
-    subcat: document.getElementById('lr-subcat') ? document.getElementById('lr-subcat').value : '',
     juros:parseFloat(document.getElementById('lr-juros').value)||null,
     obs:document.getElementById('lr-obs').value,
     parcela_datas: parcelas > 1 ? buildParcelaDatasPayload('lr-parcela-dates', parcelas) : null };
@@ -8474,10 +8654,6 @@ function editLancReceber(id) {
   populateDreCatSelects();
   const ecd = document.getElementById('elr-catdre');
   if (ecd) ecd.value = l.cat_dre || '';
-  onCategoriaChange('elr-catdre','elr-subcat');
-  const esc = document.getElementById('elr-subcat');
-  if (esc) esc.value = l.subcat || '';
-  resetAvisoSubcat('elr-subcat');
   // Populate manual parcela dates if present
   if (l.parcelas > 1) {
     toggleParcelaDates('elr-parcelas', 'elr-parcela-dates');
@@ -8496,7 +8672,6 @@ async function updateLancReceber() {
   const recebido=document.getElementById('elr-recebido').value;
   const banco = document.getElementById('elr-banco') ? document.getElementById('elr-banco').value : (l.banco||'');
   if (!validarBancoObrigatorio(recebido, banco)) return;
-  if (!validarSubcategoria('elr-catdre','elr-subcat')) return;
   const _empLR = empresaDoForm('elr-empresa');
   if (_empLR === null) return;
   l.empresa_id = _empLR;
@@ -8513,10 +8688,9 @@ async function updateLancReceber() {
   l.juros=parseFloat(document.getElementById('elr-juros').value)||null;
   l.obs=document.getElementById('elr-obs').value;
   l.cat_dre = document.getElementById('elr-catdre') ? document.getElementById('elr-catdre').value : (l.cat_dre||'');
-  l.subcat  = document.getElementById('elr-subcat')  ? document.getElementById('elr-subcat').value  : (l.subcat||'');
   const manualDates = l.parcelas > 1 ? getManualParcelaDates('elr-parcela-dates', l.parcelas) : null;
   l.parcela_datas = l.parcelas > 1 ? buildParcelaDatasPayload('elr-parcela-dates', l.parcelas) : null;
-  await sbFetch('lancreceber','PATCH',{empresa_id:l.empresa_id,dtvenda:l.dtvenda,dtprev:l.dtprev,nf:l.nf,cliente:l.cliente,prod:l.prod,valor:l.valor,parcelas:l.parcelas,financeiro:l.financeiro,recebido:l.recebido,banco:l.banco,obs:l.obs,cat_dre:l.cat_dre,subcat:l.subcat,parcela_datas:l.parcela_datas},`?id=eq.${id}`);
+  await sbFetch('lancreceber','PATCH',{empresa_id:l.empresa_id,dtvenda:l.dtvenda,dtprev:l.dtprev,nf:l.nf,cliente:l.cliente,prod:l.prod,valor:l.valor,parcelas:l.parcelas,financeiro:l.financeiro,recebido:l.recebido,banco:l.banco,obs:l.obs,cat_dre:l.cat_dre,parcela_datas:l.parcela_datas},`?id=eq.${id}`);
   closeModal('modal-lancreceber'); renderLancReceber();
 }
 async function deleteLancReceber(id) {
@@ -9141,24 +9315,47 @@ function categoriaExigeSubcat(catId) {
   return !!catId && subcatsDaCategoria(catId).length > 0;
 }
 
-// Mostra/esconde o aviso de revisão embaixo do campo de subcategoria
-function _marcarAvisoSubcat(subSelId, pendente) {
+// Mostra o estado do campo de subcategoria abaixo dele.
+// estado: 'pendente' (laranja), 'ok' (verde) ou null/false (some).
+function _marcarAvisoSubcat(subSelId, estado) {
   const subEl = document.getElementById(subSelId);
   if (!subEl) return;
   // O select pode ter sido embrulhado pelo combo de busca — sobe até o form-group
   const grupo = subEl.closest('.form-group') || subEl.parentNode;
   if (!grupo) return;
   let aviso = grupo.querySelector('.subcat-aviso');
-  if (pendente) {
-    if (!aviso) {
-      aviso = document.createElement('div');
-      aviso.className = 'subcat-aviso';
-      aviso.style.cssText = 'margin-top:4px;font-size:11px;color:#d97706;font-weight:600;line-height:1.35;';
-      grupo.appendChild(aviso);
-    }
+  if (estado === true) estado = 'pendente'; // compatibilidade
+  if (!estado) { if (aviso) aviso.remove(); return; }
+  if (!aviso) {
+    aviso = document.createElement('div');
+    aviso.className = 'subcat-aviso';
+    grupo.appendChild(aviso);
+  }
+  const base = 'margin-top:4px;font-size:11px;font-weight:600;line-height:1.35;';
+  if (estado === 'ok') {
+    aviso.style.cssText = base + 'color:#166534;';
+    aviso.textContent = '✅ Aprovado — subcategoria compatível com a categoria.';
+  } else {
+    aviso.style.cssText = base + 'color:#d97706;';
     aviso.textContent = '⚠️ Categoria alterada — revise e escolha a subcategoria.';
-  } else if (aviso) {
-    aviso.remove();
+  }
+}
+
+// Handler do onchange da Subcategoria: assim que o usuário escolhe uma
+// subcategoria válida para a categoria atual, o aviso laranja vira o
+// "Aprovado" verde, sem precisar tentar salvar para descobrir.
+function onSubcategoriaChange(catSelId, subSelId) {
+  const catEl = document.getElementById(catSelId);
+  const subEl = document.getElementById(subSelId);
+  if (!catEl || !subEl) return;
+  const catId = catEl.value, subId = subEl.value;
+  if (!categoriaExigeSubcat(catId)) { _marcarAvisoSubcat(subSelId, false); return; }
+  if (subId && getDfcSubCat(subId) === catId) {
+    _subcatPendente[subSelId] = false;
+    _marcarAvisoSubcat(subSelId, 'ok');
+  } else {
+    _subcatPendente[subSelId] = true;
+    _marcarAvisoSubcat(subSelId, 'pendente');
   }
 }
 
@@ -9205,7 +9402,7 @@ function validarSubcategoria(catSelId, subSelId) {
     return false;
   }
   _subcatPendente[subSelId] = false;
-  _marcarAvisoSubcat(subSelId, false);
+  _marcarAvisoSubcat(subSelId, 'ok');
   return true;
 }
 
@@ -9233,8 +9430,9 @@ function onCategoriaChange(catSelId, subSelId) {
 // Recarrega todos os selects de subcategoria dos formulários de lançamento,
 // respeitando a categoria escolhida em cada um.
 function populateSubcatSelects() {
+  // Contas a Receber usa apenas Categoria (sem subcategoria), por isso
+  // lr-* e elr-* não aparecem aqui.
   [['l-catdre','l-subcat'], ['edit-catdre','edit-subcat'],
-   ['lr-catdre','lr-subcat'], ['elr-catdre','elr-subcat'],
    ['dfc-lan-cat','dfc-lan-subcat']].forEach(([c,s]) => onCategoriaChange(c,s));
 }
 
@@ -9770,6 +9968,183 @@ function imprimirAnaliseSubcategoria() {
   win.document.close();
 }
 
+// ══════════════════════════════════════════════════════════════════
+// METAS MENSAIS POR CATEGORIA
+// Guardadas na tabela "config" (sem tabela nova), uma linha por
+// categoria+ano: key = "metas_cat:<idCategoria>:<ano>"
+// value = JSON no formato { "1": 15000, "2": 18000, ... }
+// Usa o mesmo padrão de upsert das Metas do DRE (consulta e faz PATCH,
+// ou POST só se não existir), para não criar linhas duplicadas.
+// ══════════════════════════════════════════════════════════════════
+let metasCategoria = {}; // metasCategoria['<catId>:<ano>'] = { mes: valor }
+
+async function carregarMetasCategoria() {
+  try {
+    const rows = await sbFetch('config', 'GET', null, '?key=like.metas_cat:*');
+    metasCategoria = {};
+    (rows || []).forEach(c => {
+      const partes = c.key.split(':'); // metas_cat : catId : ano
+      const chave = partes[1] + ':' + partes[2];
+      try { metasCategoria[chave] = JSON.parse(c.value) || {}; } catch(e) { metasCategoria[chave] = {}; }
+    });
+  } catch(e) { console.error('Erro ao carregar metas por categoria:', e); }
+}
+
+async function salvarMetasCategoriaChave(catId, ano) {
+  const chave = catId + ':' + ano;
+  const key = 'metas_cat:' + chave;
+  const value = JSON.stringify(metasCategoria[chave] || {});
+  const existentes = await sbFetch('config', 'GET', null, `?key=eq.${encodeURIComponent(key)}&select=id`);
+  if (existentes === null) return false;
+  if (existentes.length) {
+    const ok = await sbFetch('config', 'PATCH', { value }, `?key=eq.${encodeURIComponent(key)}`);
+    return !!ok;
+  }
+  return !!(await sbFetch('config', 'POST', { id: uid(), key, value }));
+}
+
+// Prepara os selects e desenha a tela
+function abrirMetasCategoria() {
+  const catEl = document.getElementById('mc-cat');
+  if (catEl) {
+    const val = catEl.value;
+    const cats = [...db.dfc_cats].sort((a,b) => (a.nome||'').localeCompare(b.nome||''));
+    catEl.innerHTML = '<option value="">Selecione...</option>' +
+      cats.map(c => `<option value="${c.id}">${c.nome} (${getDfcGrupoLabel(c.grupo)})</option>`).join('');
+    if (val && cats.some(c => c.id === val)) catEl.value = val;
+    else {
+      // Começa já na categoria "Produtos", quando ela existir
+      const produtos = cats.find(c => normText(c.nome||'') === 'produtos');
+      if (produtos) catEl.value = produtos.id;
+    }
+  }
+  const anoEl = document.getElementById('mc-ano');
+  if (anoEl) {
+    const val = anoEl.value;
+    const cur = new Date().getFullYear();
+    const anos = [];
+    for (let y = cur - 2; y <= cur + 2; y++) anos.push(y);
+    anoEl.innerHTML = anos.map(y => `<option value="${y}">${y}</option>`).join('');
+    anoEl.value = val || cur;
+  }
+  renderMetasCategoria();
+}
+
+// Soma o realizado do ano para a categoria, por mês (compras + vendas + DFC)
+function _realizadoCategoriaMes(catId, ano) {
+  const real = Array(13).fill(0);
+  const somar = (dt, valor) => {
+    if (!dt) return;
+    const partes = dt.split('-');
+    if (parseInt(partes[0]) !== ano) return;
+    real[parseInt(partes[1])] += (valor || 0);
+  };
+  db.lancamentos.forEach(l => {
+    const c = l.cat_dre || ((db.produtos.find(x => x.id === l.prod)||{}).cat) || '';
+    if (c === catId) somar(l.dtcompra, l.valor);
+  });
+  db.lancreceber.forEach(l => {
+    const c = l.cat_dre || ((db.prodvenda.find(x => x.id === l.prod)||{}).cat) || '';
+    if (c === catId) somar(l.dtvenda || l.dtcompra, l.valor);
+  });
+  db.dfc_lans.forEach(l => { if (l.cat === catId) somar(l.data, l.valor); });
+  return real;
+}
+
+function renderMetasCategoria() {
+  const wrap = document.getElementById('mc-tabela-wrap');
+  if (!wrap) return;
+  const catId = (document.getElementById('mc-cat')||{}).value || '';
+  const ano   = parseInt((document.getElementById('mc-ano')||{}).value) || new Date().getFullYear();
+
+  if (!catId) {
+    wrap.innerHTML = '<div class="empty-state" style="padding:32px">Selecione uma categoria para definir as metas.</div>';
+    return;
+  }
+
+  const chave = catId + ':' + ano;
+  const metas = metasCategoria[chave] || {};
+  const real = _realizadoCategoriaMes(catId, ano);
+
+  let totalMeta = 0, totalReal = 0;
+  const linhas = [];
+  for (let m = 1; m <= 12; m++) {
+    const meta = parseFloat(metas[m]) || 0;
+    const rea  = real[m] || 0;
+    totalMeta += meta; totalReal += rea;
+    const dif = rea - meta;
+    const pct = meta ? (rea / meta * 100) : 0;
+    const corDif = Math.abs(dif) < 0.005 ? '#a8a29e' : (dif > 0 ? '#166534' : '#dc2626');
+    linhas.push(`<tr>
+      <td>${meses[m]}</td>
+      <td><input type="number" step="0.01" id="mc-meta-${m}" value="${meta ? meta : ''}" placeholder="0,00"
+           style="width:130px;padding:5px 8px;font-family:DM Mono,monospace;text-align:right;" /></td>
+      <td style="text-align:right;font-family:DM Mono,monospace">${fmtBRL(rea)}</td>
+      <td style="text-align:right;font-family:DM Mono,monospace;color:${corDif}">${dif >= 0 ? '+' : '−'} ${fmtBRL(Math.abs(dif))}</td>
+      <td style="text-align:right;font-family:DM Mono,monospace">${meta ? pct.toFixed(1).replace('.',',') + '%' : '—'}</td>
+    </tr>`);
+  }
+
+  const difT = totalReal - totalMeta;
+  const pctT = totalMeta ? (totalReal / totalMeta * 100) : 0;
+  const corT = Math.abs(difT) < 0.005 ? '#a8a29e' : (difT > 0 ? '#166534' : '#dc2626');
+
+  wrap.innerHTML = `
+    <div style="font-size:12px;color:#a8a29e;margin-bottom:10px;">
+      Categoria <b style="color:#57534e">${getDfcCatNome(catId)}</b> — ano ${ano}.
+      O <b>Realizado</b> soma compras, vendas e lançamentos do DFC dessa categoria, por competência.
+    </div>
+    <table>
+      <thead><tr>
+        <th>Mês</th><th>Meta (R$)</th>
+        <th style="text-align:right">Realizado</th>
+        <th style="text-align:right">Diferença</th>
+        <th style="text-align:right">% da Meta</th>
+      </tr></thead>
+      <tbody>${linhas.join('')}</tbody>
+      <tfoot><tr class="dre-row-final">
+        <td>TOTAL</td>
+        <td style="text-align:right;font-family:DM Mono,monospace">${fmtBRL(totalMeta)}</td>
+        <td style="text-align:right;font-family:DM Mono,monospace">${fmtBRL(totalReal)}</td>
+        <td style="text-align:right;font-family:DM Mono,monospace;color:${corT}">${difT >= 0 ? '+' : '−'} ${fmtBRL(Math.abs(difT))}</td>
+        <td style="text-align:right;font-family:DM Mono,monospace">${totalMeta ? pctT.toFixed(1).replace('.',',') + '%' : '—'}</td>
+      </tr></tfoot>
+    </table>`;
+}
+
+async function salvarMetasCategoria() {
+  const catId = (document.getElementById('mc-cat')||{}).value || '';
+  const ano   = parseInt((document.getElementById('mc-ano')||{}).value) || 0;
+  if (!catId || !ano) { alert('Selecione a categoria e o ano.'); return; }
+  const chave = catId + ':' + ano;
+  const novo = {};
+  for (let m = 1; m <= 12; m++) {
+    const el = document.getElementById('mc-meta-' + m);
+    const v = el ? parseFloat(el.value) : NaN;
+    if (!isNaN(v) && v !== 0) novo[m] = v;
+  }
+  metasCategoria[chave] = novo;
+  showLoading(true);
+  const ok = await salvarMetasCategoriaChave(catId, ano);
+  showLoading(false);
+  if (!ok) { alert('❌ Não foi possível salvar as metas.' + sbErroDetalhe()); return; }
+  alert(`✅ Metas de "${getDfcCatNome(catId)}" salvas para ${ano}.`);
+  renderMetasCategoria();
+}
+
+async function limparMetasCategoria() {
+  const catId = (document.getElementById('mc-cat')||{}).value || '';
+  const ano   = parseInt((document.getElementById('mc-ano')||{}).value) || 0;
+  if (!catId || !ano) return;
+  if (!confirm(`Apagar todas as metas de "${getDfcCatNome(catId)}" em ${ano}?`)) return;
+  metasCategoria[catId + ':' + ano] = {};
+  showLoading(true);
+  const ok = await salvarMetasCategoriaChave(catId, ano);
+  showLoading(false);
+  if (!ok) { alert('❌ Não foi possível limpar as metas.' + sbErroDetalhe()); return; }
+  renderMetasCategoria();
+}
+
 // ── LANÇAMENTOS DFC ───────────────────────────────────────────────
 async function saveDfcLancamento() {
   const data  = document.getElementById('dfc-lan-data').value;
@@ -10275,14 +10650,28 @@ function getDreCatGrupo(id) { const c = db.dfc_cats.find(x => x.id === id); retu
 // Popula o select "Categoria" nos lançamentos a pagar/receber com as
 // Categorias já cadastradas em DFC → Categorias (mesma lista, sem duplicidade)
 function populateDreCatSelects() {
-  const opts = '<option value="">Nenhuma</option>' +
-    db.dfc_cats.map(cat => `<option value="${cat.id}">${cat.nome} (${getDreGrupoNome(cat.grupo)})</option>`).join('');
-  ['l-catdre','edit-catdre','lr-catdre','elr-catdre'].forEach(id => {
+  const montarOpts = (lista) => '<option value="">Nenhuma</option>' +
+    lista.map(cat => `<option value="${cat.id}">${cat.nome} (${getDreGrupoNome(cat.grupo)})</option>`).join('');
+
+  // Contas a Pagar (compras): todas as categorias.
+  const optsTodas = montarOpts(db.dfc_cats);
+
+  // Contas a Receber: só categorias de RECEITA, para não oferecer contas de
+  // despesa numa venda. Considera tanto o Tipo marcado na categoria quanto o
+  // tipo do grupo do DRE a que ela pertence — categorias antigas às vezes têm
+  // só um dos dois preenchido corretamente.
+  const receitas = db.dfc_cats.filter(cat =>
+    cat.tipo === 'entrada' || getDfcGrupoTipo(cat.grupo) === 'entrada');
+  const optsReceita = montarOpts(receitas);
+
+  [['l-catdre', optsTodas], ['edit-catdre', optsTodas],
+   ['lr-catdre', optsReceita], ['elr-catdre', optsReceita]].forEach(([id, opts]) => {
     const el = document.getElementById(id);
     if (!el) return;
     const val = el.value;
     el.innerHTML = opts;
-    if (val) el.value = val;
+    // Só reaplica o valor anterior se ele ainda existir na lista filtrada
+    if (val && el.querySelector(`option[value="${val}"]`)) el.value = val;
   });
   // Recarrega as subcategorias de cada select, respeitando a categoria atual
   populateSubcatSelects();
