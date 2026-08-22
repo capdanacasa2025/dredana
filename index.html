@@ -8848,6 +8848,7 @@ async function saveDfcCategoria() {
   await sbFetch('dfc_categorias', 'POST', rec);
   db.dfc_cats.push(rec);
   clearDfcCategoria(); renderDfcCategorias(); populateDfcCatSelects(); populateDfcCatProdSelects(); popularCategoriasAnalise(); popularFiltrosGrupoCategoriaTodos();
+  fecharFormModalSeAberto('form-dfccat');
 }
 async function updateDfcCategoria(id) {
   const cat = db.dfc_cats.find(x => x.id === id);
@@ -8862,6 +8863,7 @@ async function updateDfcCategoria(id) {
   const res = await sbFetch('dfc_categorias', 'PATCH', { nome:cat.nome, grupo:cat.grupo, tipo:cat.tipo, obs:cat.obs }, `?id=eq.${id}`);
   if (!res) { alert('❌ Erro ao atualizar categoria.'); return; }
   clearDfcCategoria(); renderDfcCategorias(); populateDfcCatSelects(); populateDfcCatProdSelects(); popularCategoriasAnalise(); popularFiltrosGrupoCategoriaTodos();
+  fecharFormModalSeAberto('form-dfccat');
 }
 function editDfcCategoria(id) {
   const cat = db.dfc_cats.find(x => x.id === id);
@@ -8873,7 +8875,7 @@ function editDfcCategoria(id) {
   document.getElementById('dfc-cat-obs').value = cat.obs || '';
   document.getElementById('dfc-cat-form-title').textContent = 'Editar Categoria';
   document.getElementById('dfc-cat-btn-salvar').textContent = 'Salvar Alterações';
-  abrirFormPanel('form-dfccat', 'btn-novo-dfccat');
+  abrirFormPanel('form-dfccat', 'btn-novo-dfccat', 'Editar Categoria');
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function clearDfcCategoria() {
@@ -8973,6 +8975,7 @@ async function saveDfcLancamento() {
   await sbFetch('dfc_lancamentos','POST',rec);
   db.dfc_lans.push(rec);
   clearDfcLancamento(); renderDfcLancamentos(); populateDfcYearSelects();
+  fecharFormModalSeAberto('form-dfclan');
 }
 function clearDfcLancamento() {
   document.getElementById('dfc-lan-data').value = today();
@@ -11403,7 +11406,9 @@ const PAINEIS_MODAL = {
   'form-forn':    'Novo Fornecedor',
   'form-cli':     'Novo Cliente',
   'form-bnk':     'Nova Conta / Banco',
-  'form-empresa': 'Nova Empresa'
+  'form-empresa': 'Nova Empresa',
+  'form-dfccat':  'Nova Categoria',
+  'form-dfclan':  'Novo Lançamento'
 };
 
 let _formModalAtual = null;
@@ -11457,8 +11462,8 @@ function toggleFormPanel(panelId, btn) {
 }
 // Força a abertura de um form-panel (usado ao clicar em "Editar" numa linha,
 // para garantir que o formulário fique visível mesmo se estiver recolhido).
-function abrirFormPanel(panelId, btnId) {
-  if (PAINEIS_MODAL[panelId]) { abrirFormModal(panelId, PAINEIS_MODAL[panelId]); return; }
+function abrirFormPanel(panelId, btnId, titulo) {
+  if (PAINEIS_MODAL[panelId]) { abrirFormModal(panelId, titulo || PAINEIS_MODAL[panelId]); return; }
   const panel = document.getElementById(panelId);
   const btn = document.getElementById(btnId);
   if (panel) panel.classList.add('open');
