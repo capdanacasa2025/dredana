@@ -776,6 +776,10 @@ th.ef-th { padding:8px 8px 8px 12px; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
           Categorias
         </div>
+        <div class="nav-sub-item" onclick="showPage('dfc-subcategorias')" id="nav-dfc-subcategorias">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/></svg>
+          Subcategorias
+        </div>
         <div class="nav-sub-item" onclick="showPage('dfc-lancamentos')" id="nav-dfc-lancamentos">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
           Lançamentos
@@ -795,6 +799,10 @@ th.ef-th { padding:8px 8px 8px 12px; }
         <div class="nav-sub-item" onclick="showPage('dre-analise-cat')" id="nav-dre-analise-cat">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
           Análise por Categoria
+        </div>
+        <div class="nav-sub-item" onclick="showPage('dre-analise-subcat')" id="nav-dre-analise-subcat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Análise por Subcategoria
         </div>
       </div>
 
@@ -1595,6 +1603,55 @@ th.ef-th { padding:8px 8px 8px 12px; }
       </div>
     </div>
 
+    <!-- ══ DFC SUBCATEGORIAS ══ -->
+    <div class="page" id="page-dfc-subcategorias">
+      <div class="page-header">
+        <div><div class="page-title">Subcategorias</div><div class="page-sub" style="margin-bottom:0">Detalha uma categoria em itens menores. Ex.: a categoria <b>RH</b> pode ter <b>Salários</b>, <b>Férias</b> e <b>Provisão de 13º</b>.</div></div>
+        <button class="btn-novo" id="btn-novo-dfcsub" onclick="toggleFormPanel('form-dfcsub',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo
+        </button>
+      </div>
+      <div class="form-panel" id="form-dfcsub">
+      <div class="card">
+        <div class="card-title" id="dfc-sub-form-title">Nova Subcategoria</div>
+        <input type="hidden" id="dfc-sub-edit-id" />
+        <div class="grid3">
+          <div class="form-group"><label class="label-add">Categoria *<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','dfc-sub-cat')">+</button></label>
+            <select id="dfc-sub-cat">
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Nome *</label><input id="dfc-sub-nome" type="text" placeholder="Ex: Salários, Férias, Provisão de 13º..." /></div>
+          <div class="form-group"><label>Observações</label><input id="dfc-sub-obs" type="text" placeholder="Descrição opcional" /></div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="saveDfcSubcategoria()" id="dfc-sub-btn-salvar">Salvar Subcategoria</button>
+          <button class="btn btn-secondary" onclick="clearDfcSubcategoria()">Limpar</button>
+        </div>
+      </div>
+      </div><!-- /form-panel -->
+      <div class="card">
+        <div class="card-title">Subcategorias Cadastradas</div>
+        <div class="filter-row">
+          <div class="form-group" style="min-width:260px"><label>Buscar</label>
+            <input type="text" id="dfcsub-busca" oninput="renderDfcSubcategorias()" placeholder="Nome, categoria ou observação..." />
+          </div>
+          <div class="form-group"><label>Grupo</label>
+            <select id="dfcsub-fgrupo" onchange="popularFiltroCatSubcategorias(); renderDfcSubcategorias()"><option value="">Todos</option></select>
+          </div>
+          <div class="form-group"><label>Categoria</label>
+            <select id="dfcsub-fcat" onchange="renderDfcSubcategorias()"><option value="">Todas</option></select>
+          </div>
+          <div style="align-self:flex-end"><button class="btn btn-secondary" onclick="clearDfcSubFiltros()">Limpar</button></div>
+        </div>
+        <div class="table-scroll"><table><thead><tr id="th-dfc-subs-row">
+          <th>Nome</th><th>Categoria</th><th>Grupo</th><th>Obs</th><th>Ações</th>
+        </tr></thead><tbody id="tb-dfc-subs">
+          <tr><td colspan="5" class="empty-state">Nenhuma subcategoria cadastrada.</td></tr>
+        </tbody></table></div>
+      </div>
+    </div>
+
     <!-- ══ DFC LANÇAMENTOS ══ -->
     <div class="page" id="page-dfc-lancamentos">
       <div class="page-header">
@@ -1610,7 +1667,10 @@ th.ef-th { padding:8px 8px 8px 12px; }
           <div class="form-group" style="display:none"><label>Empresa *</label><select id="dfc-lan-empresa" class="sel-empresa"><option value="">Selecione...</option></select></div>
           <div class="form-group"><label>Data *</label><input id="dfc-lan-data" type="date" /></div>
           <div class="form-group"><label class="label-add">Categoria *<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','dfc-lan-cat')">+</button></label>
-            <select id="dfc-lan-cat"><option value="">Selecione...</option></select>
+            <select id="dfc-lan-cat" onchange="onCategoriaChangeUsuario('dfc-lan-cat','dfc-lan-subcat')"><option value="">Selecione...</option></select>
+          </div>
+          <div class="form-group"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label>
+            <select id="dfc-lan-subcat"><option value="">Nenhuma</option></select>
           </div>
           <div class="form-group"><label>Valor (R$) *</label><input id="dfc-lan-valor" type="number" step="0.01" placeholder="0,00" /></div>
         </div>
@@ -1861,6 +1921,65 @@ th.ef-th { padding:8px 8px 8px 12px; }
 
       <div class="card" style="margin-bottom:20px;overflow-x:auto;">
         <div id="ac-tabela-wrap">
+          <div class="empty-state" style="padding:32px">Selecione um ano para visualizar a análise.</div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ══ ANÁLISE POR SUBCATEGORIA ══ -->
+    <div class="page" id="page-dre-analise-subcat">
+      <div class="page-header"><div><div class="page-title">Análise por Subcategoria</div><div class="page-sub" style="margin-bottom:0">Detalhamento mensal de cada subcategoria, agrupada pela categoria a que pertence</div></div><button class="btn-pdf" onclick="imprimirAnaliseSubcategoria()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> PDF</button></div>
+
+      <div class="card" style="padding:14px 20px;margin-bottom:16px;">
+        <div class="filter-row">
+          <div class="form-group"><label>Ano</label>
+            <select id="asc-ano" onchange="renderAnaliseSubcategoria()" style="width:110px;">
+              <option value="">Selecione</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Mês</label>
+            <select id="asc-mes" onchange="renderAnaliseSubcategoria()">
+              <option value="">Todos (Jan–Dez)</option>
+              <option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option>
+              <option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option>
+              <option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option>
+              <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Grupo</label>
+            <select id="asc-grupo" onchange="popularCategoriasAnaliseSub(); renderAnaliseSubcategoria()">
+              <option value="">Todos os Grupos</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Categoria</label>
+            <select id="asc-categoria" onchange="renderAnaliseSubcategoria()">
+              <option value="">Todas as Categorias</option>
+            </select>
+          </div>
+          <div style="align-self:flex-end"><button class="btn btn-secondary" onclick="limparFiltrosAnaliseSubcategoria()">Limpar Filtros</button></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f5f4f2;">
+          <span style="font-size:11px;color:#a8a29e;font-weight:600;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;">Meses visíveis:</span>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-1" checked onchange="renderAnaliseSubcategoria()" />Jan</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-2" checked onchange="renderAnaliseSubcategoria()" />Fev</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-3" checked onchange="renderAnaliseSubcategoria()" />Mar</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-4" checked onchange="renderAnaliseSubcategoria()" />Abr</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-5" checked onchange="renderAnaliseSubcategoria()" />Mai</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-6" checked onchange="renderAnaliseSubcategoria()" />Jun</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-7" checked onchange="renderAnaliseSubcategoria()" />Jul</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-8" checked onchange="renderAnaliseSubcategoria()" />Ago</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-9" checked onchange="renderAnaliseSubcategoria()" />Set</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-10" checked onchange="renderAnaliseSubcategoria()" />Out</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-11" checked onchange="renderAnaliseSubcategoria()" />Nov</label>
+          <label class="dre-mes-chip"><input type="checkbox" id="asc-mes-12" checked onchange="renderAnaliseSubcategoria()" />Dez</label>
+          <button class="btn btn-secondary btn-sm" onclick="ascMesesTodos(true)">Marcar todos</button>
+          <button class="btn btn-secondary btn-sm" onclick="ascMesesTodos(false)">Ocultar todos</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px;overflow-x:auto;">
+        <div id="asc-tabela-wrap">
           <div class="empty-state" style="padding:32px">Selecione um ano para visualizar a análise.</div>
         </div>
       </div>
@@ -2202,7 +2321,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Valor Total (R$) *</label><input id="l-valor" type="number" step="0.01" placeholder="0,00" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','l-catdre')">+</button></label><select id="l-catdre"><option value="">Nenhuma</option></select></div>
+      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','l-catdre')">+</button></label><select id="l-catdre" onchange="onCategoriaChangeUsuario('l-catdre','l-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="l-subcat"><option value="">Nenhuma</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group">
@@ -2292,7 +2411,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Valor Total (R$) *</label><input id="lr-valor" type="number" step="0.01" placeholder="0,00" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','lr-catdre')">+</button></label><select id="lr-catdre"><option value="">Nenhuma</option></select></div>
+      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','lr-catdre')">+</button></label><select id="lr-catdre" onchange="onCategoriaChangeUsuario('lr-catdre','lr-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="lr-subcat"><option value="">Nenhuma</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group"><label>Número de Parcelas</label>
@@ -2446,7 +2565,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Valor Total</label><input id="elr-valor" type="number" step="0.01" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','elr-catdre')">+</button></label><select id="elr-catdre"><option value="">Nenhuma</option></select></div>
+      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','elr-catdre')">+</button></label><select id="elr-catdre" onchange="onCategoriaChangeUsuario('elr-catdre','elr-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="elr-subcat"><option value="">Nenhuma</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group"><label>Parcelas</label>
@@ -2757,7 +2876,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Valor Total</label><input id="edit-valor" type="number" step="0.01" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','edit-catdre')">+</button></label><select id="edit-catdre"><option value="">Nenhuma</option></select></div>
+      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','edit-catdre')">+</button></label><select id="edit-catdre" onchange="onCategoriaChangeUsuario('edit-catdre','edit-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="edit-subcat"><option value="">Nenhuma</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group"><label>Parcelas</label>
@@ -3130,11 +3249,13 @@ const PAGES_CONFIG = [
   { id:'pedidoscancelados', label:'Pedidos Cancelados',  grupo:'receber' },
   { id:'reposicao',         label:'Reposição',           grupo:'receber' },
   { id:'dfc-categorias',    label:'DFC Categorias',      grupo:'dfc'     },
+  { id:'dfc-subcategorias', label:'DFC Subcategorias',   grupo:'dfc'     },
   { id:'dfc-lancamentos',   label:'DFC Lançamentos',     grupo:'dfc'     },
   { id:'dfc-demonstrativo', label:'DFC Demonstrativo',   grupo:'dfc'     },
   { id:'dre-grupos',        label:'DRE Grupos',          grupo:'dre'     },
   { id:'dre-demonstrativo', label:'DRE Demonstrativo',   grupo:'dre'     },
   { id:'dre-analise-cat',   label:'DRE Análise por Categoria', grupo:'dre' },
+  { id:'dre-analise-subcat',label:'DRE Análise por Subcategoria', grupo:'dre' },
 ];
 
 // ══════════════════════════════════════════
@@ -3351,6 +3472,7 @@ let db = {
   prodvenda: [],
   lancreceber: [],
   dfc_cats: [],
+  dfc_subcats: [],
   dfc_lans: [],
   dre_grupos: [],
   bancos: [],
@@ -3479,7 +3601,8 @@ async function loadAllData() {
       sbFetch('config', 'GET', null, '?key=in.(formas_pagamento,formas_recebimento,motivos_cancelamento,motivos_reposicao)'), // 14
       fetchAll('pedidos_cancelados', 'dt_cancelamento'), // 15
       fetchAll('reposicoes', 'dt_reposicao'), // 16
-      fetchAll('empresas', 'nome') // 17 — nunca filtrado por empresa
+      fetchAll('empresas', 'nome'), // 17 — nunca filtrado por empresa
+      fetchAll('dfc_subcategorias', 'nome') // 18 — subcategorias (Categoria → Subcategoria)
     ]);
 
     const val = (i) => results[i].status === 'fulfilled' ? results[i].value : null;
@@ -3491,6 +3614,7 @@ async function loadAllData() {
     db.prodvenda    = val(7)  || [];
     db.lancreceber  = val(8)  || [];
     db.dfc_cats     = val(9)  || [];
+    db.dfc_subcats  = val(18) || [];
     db.dfc_lans     = val(10) || [];
     db.bancos       = val(11) || [];
     db.transferencias = val(13) || [];
@@ -3759,11 +3883,13 @@ function showPage(p) {
   if (p === 'pedidoscancelados') renderPedidosCancelados();
   if (p === 'reposicao')         renderReposicoes();
   if (p === 'dfc-categorias')    renderDfcCategorias();
+  if (p === 'dfc-subcategorias') renderDfcSubcategorias();
   if (p === 'dfc-lancamentos')   renderDfcLancamentos();
   if (p === 'dfc-demonstrativo') renderDfc();
   if (p === 'dre-grupos')        { carregarDreGrupoClasses().then(renderDreGrupos); }
   if (p === 'dre-demonstrativo') { carregarVarEstoque().then(carregarDreGrupoClasses).then(renderDre); }
   if (p === 'dre-analise-cat')   { popularCategoriasAnalise(); renderAnaliseCategoria(); }
+  if (p === 'dre-analise-subcat'){ popularCategoriasAnaliseSub(); renderAnaliseSubcategoria(); }
   if (p === 'usuarios')          renderUsuariosAdmin();
   if (p === 'empresas')          renderEmpresas();
 }
@@ -3794,11 +3920,13 @@ function renderPaginaAtual() {
   if (p === 'pedidoscancelados') renderPedidosCancelados();
   if (p === 'reposicao')         renderReposicoes();
   if (p === 'dfc-categorias')    renderDfcCategorias();
+  if (p === 'dfc-subcategorias') renderDfcSubcategorias();
   if (p === 'dfc-lancamentos')   renderDfcLancamentos();
   if (p === 'dfc-demonstrativo') renderDfc();
   if (p === 'dre-grupos')        { carregarDreGrupoClasses().then(renderDreGrupos); }
   if (p === 'dre-demonstrativo') { carregarVarEstoque().then(carregarDreGrupoClasses).then(renderDre); }
   if (p === 'dre-analise-cat')   { popularCategoriasAnalise(); renderAnaliseCategoria(); }
+  if (p === 'dre-analise-subcat'){ popularCategoriasAnaliseSub(); renderAnaliseSubcategoria(); }
   if (p === 'usuarios')          renderUsuariosAdmin();
   if (p === 'empresas')          renderEmpresas();
 }
@@ -4719,6 +4847,7 @@ async function saveLancamento() {
   const prod = document.getElementById('l-prod').value;
   const valor = parseFloat(document.getElementById('l-valor').value);
   if(!dtcompra || !valor) { alert('Preencha data da compra e valor.'); return; }
+  if (!validarSubcategoria('l-catdre','l-subcat')) return;
   // Fornecedor e produto são opcionais: nem toda despesa tem um fornecedor
   // cadastrado (ex.: tarifas bancárias, impostos, taxas avulsas).
   const pago = document.getElementById('l-pago').value;
@@ -4736,6 +4865,7 @@ async function saveLancamento() {
     tipo_pag: document.getElementById('l-tipo-pag').value,
     banco,
     cat_dre: document.getElementById('l-catdre') ? document.getElementById('l-catdre').value : '',
+    subcat: document.getElementById('l-subcat') ? document.getElementById('l-subcat').value : '',
     obs: document.getElementById('l-obs').value
   };
 
@@ -4936,6 +5066,10 @@ function editLancamento(id) {
   populateDreCatSelects();
   const ecd = document.getElementById('edit-catdre');
   if (ecd) ecd.value = l.cat_dre || '';
+  onCategoriaChange('edit-catdre','edit-subcat');
+  const esc = document.getElementById('edit-subcat');
+  if (esc) esc.value = l.subcat || '';
+  resetAvisoSubcat('edit-subcat');
   // Populate manual parcela dates if present
   if (l.parcelas > 1) {
     toggleParcelaDates('edit-parcelas', 'edit-parcela-dates');
@@ -4956,6 +5090,7 @@ async function updateLancamento() {
   const pago = document.getElementById('edit-pago').value;
   const banco = document.getElementById('edit-banco') ? document.getElementById('edit-banco').value : (l.banco||'');
   if (!validarBancoObrigatorio(pago, banco)) return;
+  if (!validarSubcategoria('edit-catdre','edit-subcat')) return;
   const _empEdit = empresaDoForm('edit-empresa');
   if (_empEdit === null) return;
   l.empresa_id = _empEdit;
@@ -4972,6 +5107,7 @@ async function updateLancamento() {
   l.tipo_pag = document.getElementById('edit-tipo-pag') ? document.getElementById('edit-tipo-pag').value : (l.tipo_pag||'');
   l.banco    = banco;
   l.cat_dre  = document.getElementById('edit-catdre')   ? document.getElementById('edit-catdre').value   : (l.cat_dre||'');
+  l.subcat   = document.getElementById('edit-subcat')   ? document.getElementById('edit-subcat').value   : (l.subcat||'');
   const manualDates = l.parcelas > 1 ? getManualParcelaDates('edit-parcela-dates', l.parcelas) : null;
   l.parcela_datas = l.parcelas > 1 ? buildParcelaDatasPayload('edit-parcela-dates', l.parcelas) : null;
   await sbFetch('lancamentos', 'PATCH', {
@@ -4981,6 +5117,7 @@ async function updateLancamento() {
     parcelas: l.parcelas, financeiro: l.financeiro,
     pago: l.pago, tipo_pag: l.tipo_pag, banco: l.banco, obs: l.obs,
     cat_dre: l.cat_dre,
+    subcat: l.subcat,
     parcela_datas: l.parcela_datas
   }, `?id=eq.${l.id}`);
   closeModal('modal-lanc'); renderLancamentos();
@@ -8187,6 +8324,7 @@ async function saveLancReceber() {
   const cliente=document.getElementById('lr-cliente').value;
   const valor=parseFloat(document.getElementById('lr-valor').value);
   if(!dtvenda||!cliente||!valor){ alert('Preencha data, cliente e valor.'); return; }
+  if (!validarSubcategoria('lr-catdre','lr-subcat')) return;
   const recebido=document.getElementById('lr-recebido').value;
   const banco=document.getElementById('lr-banco').value;
   if (!validarBancoObrigatorio(recebido, banco)) return;
@@ -8203,6 +8341,7 @@ async function saveLancReceber() {
     tipo_pag:document.getElementById('lr-tipo-pag').value,
     banco,
     cat_dre: document.getElementById('lr-catdre') ? document.getElementById('lr-catdre').value : '',
+    subcat: document.getElementById('lr-subcat') ? document.getElementById('lr-subcat').value : '',
     juros:parseFloat(document.getElementById('lr-juros').value)||null,
     obs:document.getElementById('lr-obs').value,
     parcela_datas: parcelas > 1 ? buildParcelaDatasPayload('lr-parcela-dates', parcelas) : null };
@@ -8335,6 +8474,10 @@ function editLancReceber(id) {
   populateDreCatSelects();
   const ecd = document.getElementById('elr-catdre');
   if (ecd) ecd.value = l.cat_dre || '';
+  onCategoriaChange('elr-catdre','elr-subcat');
+  const esc = document.getElementById('elr-subcat');
+  if (esc) esc.value = l.subcat || '';
+  resetAvisoSubcat('elr-subcat');
   // Populate manual parcela dates if present
   if (l.parcelas > 1) {
     toggleParcelaDates('elr-parcelas', 'elr-parcela-dates');
@@ -8353,6 +8496,7 @@ async function updateLancReceber() {
   const recebido=document.getElementById('elr-recebido').value;
   const banco = document.getElementById('elr-banco') ? document.getElementById('elr-banco').value : (l.banco||'');
   if (!validarBancoObrigatorio(recebido, banco)) return;
+  if (!validarSubcategoria('elr-catdre','elr-subcat')) return;
   const _empLR = empresaDoForm('elr-empresa');
   if (_empLR === null) return;
   l.empresa_id = _empLR;
@@ -8369,9 +8513,10 @@ async function updateLancReceber() {
   l.juros=parseFloat(document.getElementById('elr-juros').value)||null;
   l.obs=document.getElementById('elr-obs').value;
   l.cat_dre = document.getElementById('elr-catdre') ? document.getElementById('elr-catdre').value : (l.cat_dre||'');
+  l.subcat  = document.getElementById('elr-subcat')  ? document.getElementById('elr-subcat').value  : (l.subcat||'');
   const manualDates = l.parcelas > 1 ? getManualParcelaDates('elr-parcela-dates', l.parcelas) : null;
   l.parcela_datas = l.parcelas > 1 ? buildParcelaDatasPayload('elr-parcela-dates', l.parcelas) : null;
-  await sbFetch('lancreceber','PATCH',{empresa_id:l.empresa_id,dtvenda:l.dtvenda,dtprev:l.dtprev,nf:l.nf,cliente:l.cliente,prod:l.prod,valor:l.valor,parcelas:l.parcelas,financeiro:l.financeiro,recebido:l.recebido,banco:l.banco,obs:l.obs,cat_dre:l.cat_dre,parcela_datas:l.parcela_datas},`?id=eq.${id}`);
+  await sbFetch('lancreceber','PATCH',{empresa_id:l.empresa_id,dtvenda:l.dtvenda,dtprev:l.dtprev,nf:l.nf,cliente:l.cliente,prod:l.prod,valor:l.valor,parcelas:l.parcelas,financeiro:l.financeiro,recebido:l.recebido,banco:l.banco,obs:l.obs,cat_dre:l.cat_dre,subcat:l.subcat,parcela_datas:l.parcela_datas},`?id=eq.${id}`);
   closeModal('modal-lancreceber'); renderLancReceber();
 }
 async function deleteLancReceber(id) {
@@ -8808,6 +8953,7 @@ function populateDfcCatSelects() {
     const el = document.getElementById(id);
     if (el) el.innerHTML = opts;
   });
+  onCategoriaChange('dfc-lan-cat','dfc-lan-subcat');
   const filterOpts = '<option value="">Todas</option>' +
     db.dfc_cats.map(cat => `<option value="${cat.id}">${cat.nome}</option>`).join('');
   ['dfcl-cat'].forEach(id => {
@@ -8960,15 +9106,681 @@ async function deleteDfcCategoria(id) {
   renderDfcCategorias(); populateDfcCatSelects(); popularCategoriasAnalise(); popularFiltrosGrupoCategoriaTodos();
 }
 
+// ══════════════════════════════════════════════════════════════════
+// SUBCATEGORIAS — terceiro nível: Grupo → Categoria → Subcategoria
+// Ex.: Despesas com Pessoal → RH → Salários / Férias / Provisão de 13º
+// ══════════════════════════════════════════════════════════════════
+
+function getDfcSubNome(id) {
+  const s = db.dfc_subcats.find(x => x.id === id);
+  return s ? s.nome : (id || '—');
+}
+function getDfcSubCat(id) {
+  const s = db.dfc_subcats.find(x => x.id === id);
+  return s ? s.cat : '';
+}
+// Subcategorias de uma categoria, em ordem alfabética
+function subcatsDaCategoria(catId) {
+  if (!catId) return [];
+  return db.dfc_subcats.filter(s => s.cat === catId)
+    .sort((a,b) => (a.nome||'').localeCompare(b.nome||''));
+}
+
+// ── SUBCATEGORIA OBRIGATÓRIA ──────────────────────────────────────
+// Regra: se a categoria escolhida TEM subcategorias cadastradas, escolher
+// uma delas passa a ser obrigatório. Categorias sem subcategoria continuam
+// salvando normalmente — senão o cadastro travaria em toda categoria simples.
+//
+// Além disso, quando o usuário TROCA a categoria de um lançamento, a
+// subcategoria anterior deixa de fazer sentido. Nesse caso marcamos o campo
+// como "pendente de revisão" e bloqueamos o salvamento até que uma nova
+// subcategoria seja escolhida conscientemente.
+const _subcatPendente = {};
+
+function categoriaExigeSubcat(catId) {
+  return !!catId && subcatsDaCategoria(catId).length > 0;
+}
+
+// Mostra/esconde o aviso de revisão embaixo do campo de subcategoria
+function _marcarAvisoSubcat(subSelId, pendente) {
+  const subEl = document.getElementById(subSelId);
+  if (!subEl) return;
+  // O select pode ter sido embrulhado pelo combo de busca — sobe até o form-group
+  const grupo = subEl.closest('.form-group') || subEl.parentNode;
+  if (!grupo) return;
+  let aviso = grupo.querySelector('.subcat-aviso');
+  if (pendente) {
+    if (!aviso) {
+      aviso = document.createElement('div');
+      aviso.className = 'subcat-aviso';
+      aviso.style.cssText = 'margin-top:4px;font-size:11px;color:#d97706;font-weight:600;line-height:1.35;';
+      grupo.appendChild(aviso);
+    }
+    aviso.textContent = '⚠️ Categoria alterada — revise e escolha a subcategoria.';
+  } else if (aviso) {
+    aviso.remove();
+  }
+}
+
+// Handler do onchange da Categoria (ação do usuário, não carga programática).
+// Recarrega a lista de subcategorias e exige uma nova escolha.
+function onCategoriaChangeUsuario(catSelId, subSelId) {
+  const subEl = document.getElementById(subSelId);
+  if (subEl) subEl.value = ''; // a subcategoria antiga não vale mais
+  onCategoriaChange(catSelId, subSelId);
+  const catEl = document.getElementById(catSelId);
+  const exige = catEl && categoriaExigeSubcat(catEl.value);
+  _subcatPendente[subSelId] = !!exige;
+  _marcarAvisoSubcat(subSelId, !!exige);
+}
+
+// Validação chamada antes de salvar. Retorna false e avisa quando faltar.
+function validarSubcategoria(catSelId, subSelId) {
+  const catEl = document.getElementById(catSelId);
+  const subEl = document.getElementById(subSelId);
+  if (!catEl || !subEl) return true;
+  const catId = catEl.value;
+  if (!categoriaExigeSubcat(catId)) {
+    // Categoria sem subcategorias: nada a exigir. Mas se sobrou uma
+    // subcategoria de outra categoria (dado antigo), zera para não gravar
+    // um vínculo inválido no banco.
+    if (subEl.value && getDfcSubCat(subEl.value) !== catId) subEl.value = '';
+    _subcatPendente[subSelId] = false;
+    _marcarAvisoSubcat(subSelId, false);
+    return true;
+  }
+  const subId = subEl.value;
+  if (!subId) {
+    _marcarAvisoSubcat(subSelId, true);
+    alert(`A categoria "${getDfcCatNome(catId)}" tem subcategorias cadastradas.\n\nEscolha a subcategoria antes de salvar.`);
+    try { subEl.focus(); } catch(e) {}
+    return false;
+  }
+  // Guarda contra subcategoria de outra categoria (dado antigo ou troca de categoria)
+  if (getDfcSubCat(subId) !== catId) {
+    subEl.value = '';
+    onCategoriaChange(catSelId, subSelId);
+    _marcarAvisoSubcat(subSelId, true);
+    alert('A subcategoria selecionada não pertence a esta categoria.\n\nEscolha novamente antes de salvar.');
+    return false;
+  }
+  _subcatPendente[subSelId] = false;
+  _marcarAvisoSubcat(subSelId, false);
+  return true;
+}
+
+// Limpa o estado de aviso ao abrir/limpar um formulário
+function resetAvisoSubcat(subSelId) {
+  _subcatPendente[subSelId] = false;
+  _marcarAvisoSubcat(subSelId, false);
+}
+
+// ── Cascata: ao trocar a Categoria, recarrega as Subcategorias dela ──
+// Preserva a subcategoria já escolhida se ela pertencer à nova categoria.
+function onCategoriaChange(catSelId, subSelId) {
+  const catEl = document.getElementById(catSelId);
+  const subEl = document.getElementById(subSelId);
+  if (!catEl || !subEl) return;
+  const anterior = subEl.value;
+  const lista = subcatsDaCategoria(catEl.value);
+  subEl.innerHTML = '<option value="">Nenhuma</option>' +
+    lista.map(s => `<option value="${s.id}">${s.nome}</option>`).join('');
+  if (anterior && lista.some(s => s.id === anterior)) subEl.value = anterior;
+  subEl.disabled = !lista.length;
+  subEl.style.opacity = lista.length ? '1' : '0.5';
+}
+
+// Recarrega todos os selects de subcategoria dos formulários de lançamento,
+// respeitando a categoria escolhida em cada um.
+function populateSubcatSelects() {
+  [['l-catdre','l-subcat'], ['edit-catdre','edit-subcat'],
+   ['lr-catdre','lr-subcat'], ['elr-catdre','elr-subcat'],
+   ['dfc-lan-cat','dfc-lan-subcat']].forEach(([c,s]) => onCategoriaChange(c,s));
+}
+
+// Preenche o select "Categoria" do formulário de subcategoria
+function populateSubcatCatSelect() {
+  const el = document.getElementById('dfc-sub-cat');
+  if (!el) return;
+  const val = el.value;
+  const cats = [...db.dfc_cats].sort((a,b) => (a.nome||'').localeCompare(b.nome||''));
+  el.innerHTML = '<option value="">Selecione...</option>' +
+    cats.map(c => `<option value="${c.id}">${c.nome} (${getDfcGrupoLabel(c.grupo)})</option>`).join('');
+  if (val) el.value = val;
+}
+
+// ── CRUD ──────────────────────────────────────────────────────────
+async function saveDfcSubcategoria() {
+  const editId = document.getElementById('dfc-sub-edit-id').value;
+  if (editId) { await updateDfcSubcategoria(editId); return; }
+  const nome = document.getElementById('dfc-sub-nome').value.trim();
+  const cat  = document.getElementById('dfc-sub-cat').value;
+  if (!nome || !cat) { alert('Preencha a categoria e o nome da subcategoria.'); return; }
+  const dup = db.dfc_subcats.some(s => s.cat === cat && normText(s.nome||'') === normText(nome));
+  if (dup) { alert('Já existe uma subcategoria com esse nome nesta categoria.'); return; }
+  const rec = { id: uid(), cat, nome, obs: document.getElementById('dfc-sub-obs').value };
+  const res = await sbFetch('dfc_subcategorias', 'POST', rec);
+  if (!res) { alert('❌ Erro ao salvar subcategoria.' + sbErroDetalhe()); return; }
+  db.dfc_subcats.push(rec);
+  clearDfcSubcategoria(); renderDfcSubcategorias(); populateSubcatSelects(); popularCategoriasAnaliseSub();
+  fecharFormModalSeAberto('form-dfcsub');
+}
+
+async function updateDfcSubcategoria(id) {
+  const sub = db.dfc_subcats.find(x => x.id === id);
+  if (!sub) return;
+  const nome = document.getElementById('dfc-sub-nome').value.trim();
+  const cat  = document.getElementById('dfc-sub-cat').value;
+  if (!nome || !cat) { alert('Preencha a categoria e o nome da subcategoria.'); return; }
+  const dup = db.dfc_subcats.some(s => s.id !== id && s.cat === cat && normText(s.nome||'') === normText(nome));
+  if (dup) { alert('Já existe uma subcategoria com esse nome nesta categoria.'); return; }
+  sub.nome = nome; sub.cat = cat;
+  sub.obs = document.getElementById('dfc-sub-obs').value;
+  const res = await sbFetch('dfc_subcategorias', 'PATCH', { nome:sub.nome, cat:sub.cat, obs:sub.obs }, `?id=eq.${id}`);
+  if (!res) { alert('❌ Erro ao atualizar subcategoria.' + sbErroDetalhe()); return; }
+  clearDfcSubcategoria(); renderDfcSubcategorias(); populateSubcatSelects(); popularCategoriasAnaliseSub();
+  fecharFormModalSeAberto('form-dfcsub');
+}
+
+function editDfcSubcategoria(id) {
+  const sub = db.dfc_subcats.find(x => x.id === id);
+  if (!sub) return;
+  populateSubcatCatSelect();
+  document.getElementById('dfc-sub-edit-id').value = id;
+  document.getElementById('dfc-sub-cat').value = sub.cat || '';
+  document.getElementById('dfc-sub-nome').value = sub.nome || '';
+  document.getElementById('dfc-sub-obs').value = sub.obs || '';
+  document.getElementById('dfc-sub-form-title').textContent = 'Editar Subcategoria';
+  document.getElementById('dfc-sub-btn-salvar').textContent = 'Salvar Alterações';
+  abrirFormPanel('form-dfcsub', 'btn-novo-dfcsub', 'Editar Subcategoria');
+}
+
+function clearDfcSubcategoria() {
+  ['dfc-sub-nome','dfc-sub-obs','dfc-sub-edit-id'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  populateSubcatCatSelect();
+  const catEl = document.getElementById('dfc-sub-cat'); if (catEl) catEl.value = '';
+  document.getElementById('dfc-sub-form-title').textContent = 'Nova Subcategoria';
+  document.getElementById('dfc-sub-btn-salvar').textContent = 'Salvar Subcategoria';
+}
+
+async function deleteDfcSubcategoria(id) {
+  // Antes de excluir, verifica se algum lançamento ainda aponta para ela —
+  // apagar sem avisar deixaria valores órfãos fora da análise.
+  const usos = db.lancamentos.filter(l => l.subcat === id).length
+             + db.lancreceber.filter(l => l.subcat === id).length
+             + db.dfc_lans.filter(l => l.subcat === id).length;
+  const aviso = usos
+    ? `Esta subcategoria está em ${usos} lançamento(s). Se excluir, esses lançamentos ficam sem subcategoria (o valor continua na categoria). Continuar?`
+    : 'Excluir esta subcategoria?';
+  if (!confirm(aviso)) return;
+  const res = await sbFetch('dfc_subcategorias','DELETE',null,`?id=eq.${id}`);
+  if (res === null) { alert('❌ Erro ao excluir subcategoria.' + sbErroDetalhe()); return; }
+  db.dfc_subcats = db.dfc_subcats.filter(x => x.id !== id);
+  if (document.getElementById('dfc-sub-edit-id').value === id) clearDfcSubcategoria();
+  renderDfcSubcategorias(); populateSubcatSelects(); popularCategoriasAnaliseSub();
+}
+
+// ── Filtros da lista ──────────────────────────────────────────────
+function popularFiltroGrupoSubcategorias() {
+  const el = document.getElementById('dfcsub-fgrupo');
+  if (!el) return;
+  const val = el.value;
+  const usados = [...new Set(db.dfc_subcats.map(s => getDfcSubCatGrupo(s)).filter(Boolean))];
+  const grupos = [...db.dre_grupos].filter(g => usados.includes(g.id)).sort((a,b)=>(a.ordem||0)-(b.ordem||0));
+  el.innerHTML = '<option value="">Todos</option>' +
+    grupos.map(g => `<option value="${g.id}">${g.nome}</option>`).join('');
+  if (val) el.value = val;
+}
+function getDfcSubCatGrupo(sub) {
+  const c = db.dfc_cats.find(x => x.id === sub.cat);
+  return c ? c.grupo : '';
+}
+function popularFiltroCatSubcategorias() {
+  const el = document.getElementById('dfcsub-fcat');
+  if (!el) return;
+  const val = el.value;
+  const fGrupo = (document.getElementById('dfcsub-fgrupo')||{}).value || '';
+  let cats = [...db.dfc_cats].filter(c => db.dfc_subcats.some(s => s.cat === c.id));
+  if (fGrupo) cats = cats.filter(c => c.grupo === fGrupo);
+  cats.sort((a,b) => (a.nome||'').localeCompare(b.nome||''));
+  el.innerHTML = '<option value="">Todas</option>' +
+    cats.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+  if (val && cats.some(c => c.id === val)) el.value = val;
+}
+function clearDfcSubFiltros() {
+  ['dfcsub-busca','dfcsub-fgrupo','dfcsub-fcat'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  popularFiltroCatSubcategorias();
+  renderDfcSubcategorias();
+}
+
+// ── Lista ─────────────────────────────────────────────────────────
+function renderDfcSubcategorias() {
+  const tb = document.getElementById('tb-dfc-subs');
+  if (!tb) return;
+  populateSubcatCatSelect();
+  popularFiltroGrupoSubcategorias();
+  popularFiltroCatSubcategorias();
+  const busca  = normText((document.getElementById('dfcsub-busca')||{}).value || '');
+  const fGrupo = (document.getElementById('dfcsub-fgrupo')||{}).value || '';
+  const fCat   = (document.getElementById('dfcsub-fcat')||{}).value || '';
+
+  const filtradas = db.dfc_subcats.filter(s => {
+    if (fCat && s.cat !== fCat) return false;
+    if (fGrupo && getDfcSubCatGrupo(s) !== fGrupo) return false;
+    if (busca) {
+      const alvo = normText(`${s.nome||''} ${getDfcCatNome(s.cat)||''} ${s.obs||''}`);
+      if (!alvo.includes(busca)) return false;
+    }
+    return true;
+  });
+
+  if (!filtradas.length) {
+    const temFiltro = busca || fGrupo || fCat;
+    tb.innerHTML = `<tr><td colspan="5" class="empty-state">${temFiltro
+      ? 'Nenhuma subcategoria encontrada com esses filtros.'
+      : 'Nenhuma subcategoria cadastrada.'}</td></tr>`;
+    return;
+  }
+
+  // Ordena por categoria e, dentro dela, por nome
+  const ordenadas = [...filtradas].sort((a,b) => {
+    const ca = getDfcCatNome(a.cat), cb = getDfcCatNome(b.cat);
+    if (ca !== cb) return ca.localeCompare(cb);
+    return (a.nome||'').localeCompare(b.nome||'');
+  });
+
+  tb.innerHTML = ordenadas.map(s => `<tr>
+      <td><b>${s.nome}</b></td>
+      <td><span class="badge badge-blue">${getDfcCatNome(s.cat)}</span></td>
+      <td style="color:#78716c;font-size:12px">${getDfcGrupoLabel(getDfcSubCatGrupo(s))}</td>
+      <td style="color:#a8a29e;font-size:12px">${s.obs||'—'}</td>
+      <td class="actions">
+        <button class="btn btn-secondary btn-sm" onclick="editDfcSubcategoria('${s.id}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteDfcSubcategoria('${s.id}')">Excluir</button>
+      </td></tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ANÁLISE POR SUBCATEGORIA
+// Mesma lógica da Análise por Categoria, um nível abaixo: soma os
+// lançamentos por subcategoria e agrupa pela categoria a que pertencem.
+// Lançamentos que têm categoria mas não têm subcategoria aparecem numa
+// linha "(Sem subcategoria)", para o total da categoria sempre bater.
+// ══════════════════════════════════════════════════════════════════
+function ascMesesTodos(marcar) {
+  for (let m = 1; m <= 12; m++) {
+    const chk = document.getElementById('asc-mes-' + m);
+    if (chk) chk.checked = !!marcar;
+  }
+  renderAnaliseSubcategoria();
+}
+
+function limparFiltrosAnaliseSubcategoria() {
+  ['asc-mes','asc-grupo','asc-categoria'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  popularCategoriasAnaliseSub();
+  for (let m = 1; m <= 12; m++) {
+    const chk = document.getElementById('asc-mes-' + m);
+    if (chk) chk.checked = true;
+  }
+  renderAnaliseSubcategoria();
+}
+
+// Popula os selects de Ano, Grupo e Categoria da tela de análise
+function popularCategoriasAnaliseSub() {
+  // Ano
+  const anoEl = document.getElementById('asc-ano');
+  if (anoEl) {
+    const anos = new Set();
+    const cur = new Date().getFullYear();
+    for (let y = cur - 2; y <= cur + 1; y++) anos.add(y);
+    db.lancamentos.forEach(l => { if (l.dtcompra) anos.add(parseInt(l.dtcompra.split('-')[0])); });
+    db.lancreceber.forEach(l => { const d = l.dtvenda||l.dtcompra; if (d) anos.add(parseInt(d.split('-')[0])); });
+    db.dfc_lans.forEach(l => { if (l.data) anos.add(parseInt(l.data.split('-')[0])); });
+    const val = anoEl.value;
+    anoEl.innerHTML = [...anos].filter(Boolean).sort((a,b)=>b-a)
+      .map(y => `<option value="${y}">${y}</option>`).join('');
+    anoEl.value = val || cur;
+  }
+  // Grupo
+  const gEl = document.getElementById('asc-grupo');
+  if (gEl) {
+    const val = gEl.value;
+    const grupos = [...db.dre_grupos].filter(g => g.tipo === 'entrada' || g.tipo === 'saida')
+      .sort((a,b)=>(a.ordem||0)-(b.ordem||0));
+    gEl.innerHTML = '<option value="">Todos os Grupos</option>' +
+      grupos.map(g => `<option value="${g.id}">${g.nome}</option>`).join('');
+    if (val) gEl.value = val;
+  }
+  // Categoria (restrita ao grupo escolhido, e só as que têm subcategoria)
+  const cEl = document.getElementById('asc-categoria');
+  if (cEl) {
+    const val = cEl.value;
+    const fGrupo = (document.getElementById('asc-grupo')||{}).value || '';
+    let cats = db.dfc_cats.filter(c => db.dfc_subcats.some(s => s.cat === c.id));
+    if (fGrupo) cats = cats.filter(c => c.grupo === fGrupo);
+    cats.sort((a,b) => (a.nome||'').localeCompare(b.nome||''));
+    cEl.innerHTML = '<option value="">Todas as Categorias</option>' +
+      cats.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+    if (val && cats.some(c => c.id === val)) cEl.value = val;
+  }
+}
+
+let _ascItensCache = {};
+let _ascAnoCache = null;
+
+function renderAnaliseSubcategoria() {
+  const wrap = document.getElementById('asc-tabela-wrap');
+  if (!wrap) return;
+  const anoEl = document.getElementById('asc-ano');
+  const ano = anoEl ? parseInt(anoEl.value) : null;
+  const mesFiltro   = parseInt((document.getElementById('asc-mes')||{}).value) || 0;
+  const grupoFiltro = (document.getElementById('asc-grupo')||{}).value || '';
+  const catFiltro   = (document.getElementById('asc-categoria')||{}).value || '';
+
+  if (!ano) { wrap.innerHTML = '<div class="empty-state" style="padding:32px">Selecione um ano.</div>'; return; }
+  if (!db.dfc_subcats.length) {
+    wrap.innerHTML = '<div class="empty-state" style="padding:32px">Nenhuma subcategoria cadastrada. Cadastre em <b>DFC &rarr; Subcategorias</b>.</div>';
+    return;
+  }
+
+  // Chave de acumulação: id da subcategoria, ou "cat::<idCategoria>" para
+  // os lançamentos que caem na categoria sem subcategoria definida.
+  const SEM_SUB = catId => 'cat::' + catId;
+  const valores = {};  // valores[chave][mes]
+  const itens   = {};  // itens[mes][chave] = lista de lançamentos
+  for (let m = 1; m <= 12; m++) itens[m] = {};
+  const garante = (chave) => {
+    if (valores[chave]) return;
+    valores[chave] = {};
+    for (let m = 1; m <= 12; m++) { valores[chave][m] = 0; itens[m][chave] = []; }
+  };
+
+  const acumula = (chave, mes, valor, item) => {
+    garante(chave);
+    valores[chave][mes] += valor;
+    itens[mes][chave].push(item);
+  };
+
+  // 1. Vendas (competência = data da venda)
+  db.lancreceber.forEach(l => {
+    const dtRef = l.dtvenda || l.dtcompra;
+    if (!dtRef) return;
+    const parts = dtRef.split('-');
+    if (parseInt(parts[0]) !== ano) return;
+    const m = parseInt(parts[1]);
+    const prodObj = db.prodvenda.find(x => x.id === l.prod);
+    const catId = l.cat_dre || (prodObj ? prodObj.cat : null);
+    if (!catId) return;
+    const chave = (l.subcat && getDfcSubCat(l.subcat) === catId) ? l.subcat : SEM_SUB(catId);
+    acumula(chave, m, (l.valor||0), {
+      tipo:'receber', data:dtRef, nome:getClienteNome(l.cliente),
+      prod: l.prod ? getProdVendaNome(l.prod) : '', valor:l.valor||0,
+      status: l.recebido === 'sim' ? 'Recebido' : 'A Receber'
+    });
+  });
+
+  // 2. Compras (competência = data da compra)
+  db.lancamentos.forEach(l => {
+    const dtRef = l.dtcompra;
+    if (!dtRef) return;
+    const parts = dtRef.split('-');
+    if (parseInt(parts[0]) !== ano) return;
+    const m = parseInt(parts[1]);
+    const prodObj = db.produtos.find(x => x.id === l.prod);
+    const catId = l.cat_dre || (prodObj ? prodObj.cat : null);
+    if (!catId) return;
+    const chave = (l.subcat && getDfcSubCat(l.subcat) === catId) ? l.subcat : SEM_SUB(catId);
+    acumula(chave, m, (l.valor||0), {
+      tipo:'pagar', data:dtRef, nome:getFornNome(l.forn),
+      prod: l.prod ? getProdNome(l.prod) : '', valor:l.valor||0,
+      status: l.pago === 'sim' ? 'Pago' : 'A Pagar'
+    });
+  });
+
+  // 3. Lançamentos avulsos do DFC
+  db.dfc_lans.forEach(l => {
+    if (!l.data) return;
+    const parts = l.data.split('-');
+    if (parseInt(parts[0]) !== ano) return;
+    const m = parseInt(parts[1]);
+    const catId = l.cat;
+    if (!catId) return;
+    const chave = (l.subcat && getDfcSubCat(l.subcat) === catId) ? l.subcat : SEM_SUB(catId);
+    acumula(chave, m, (l.valor||0), {
+      tipo:'dfc', data:l.data, nome:(l.desc||'Lançamento DFC'),
+      prod:'', valor:l.valor||0, status:'DFC'
+    });
+  });
+
+  _ascItensCache = itens;
+  _ascAnoCache = ano;
+
+  // Meses exibidos
+  let mesesExibir;
+  if (mesFiltro) mesesExibir = [mesFiltro];
+  else {
+    mesesExibir = [];
+    for (let m = 1; m <= 12; m++) {
+      const chk = document.getElementById('asc-mes-' + m);
+      if (!chk || chk.checked) mesesExibir.push(m);
+    }
+  }
+  if (!mesesExibir.length) {
+    wrap.innerHTML = '<div class="empty-state" style="padding:32px">Nenhum mês selecionado.</div>';
+    return;
+  }
+
+  const sinalCat = catId => getDfcCatTipo(catId) === 'entrada' ? 1 : -1;
+  const fmtValSigned = v => {
+    if (Math.abs(v) < 0.005) return '<span class="dfc-val-zero">—</span>';
+    if (v < 0) return `<span class="dfc-val-neg">− ${fmtBRL(Math.abs(v))}</span>`;
+    return `<span class="dfc-val-pos">+ ${fmtBRL(v)}</span>`;
+  };
+  const valorChave = (chave, mes) => (valores[chave] ? (valores[chave][mes]||0) : 0);
+  const totalChaveAno = (chave) => {
+    let s = 0; mesesExibir.forEach(m => s += valorChave(chave, m)); return s;
+  };
+
+  // Categorias visíveis: as que têm subcategoria cadastrada, respeitando filtros
+  let cats = db.dfc_cats.filter(c => db.dfc_subcats.some(s => s.cat === c.id));
+  if (grupoFiltro) cats = cats.filter(c => c.grupo === grupoFiltro);
+  if (catFiltro)   cats = cats.filter(c => c.id === catFiltro);
+  cats.sort((a,b) => (a.nome||'').localeCompare(b.nome||''));
+
+  if (!cats.length) {
+    wrap.innerHTML = '<div class="empty-state" style="padding:32px">Nenhuma categoria com subcategorias para os filtros selecionados.</div>';
+    return;
+  }
+
+  const mesesHeader = mesesExibir.map(m => `<th>${MESES_ABR[m]}</th>`).join('')
+    + (mesFiltro ? '' : '<th class="dfc-col-total">Total</th>');
+
+  let linhasHtml = '';
+  const totalGeralPorMes = {}; mesesExibir.forEach(m => totalGeralPorMes[m] = 0);
+  let totalGeralAno = 0;
+  let temLinha = false;
+
+  cats.forEach(c => {
+    const sinal = sinalCat(c.id);
+    const subs = subcatsDaCategoria(c.id);
+    const chaveSem = SEM_SUB(c.id);
+    const temSemSub = Math.abs(totalChaveAno(chaveSem)) >= 0.005;
+
+    // Só exibe a categoria se houver algum valor nela no período
+    const totalCatAno = subs.reduce((s,sub) => s + totalChaveAno(sub.id), 0) + totalChaveAno(chaveSem);
+    const algumValor = Math.abs(totalCatAno) >= 0.005;
+    if (!algumValor && !subs.length) return;
+    temLinha = true;
+
+    // Linha da categoria (soma de todas as subcategorias + sem subcategoria)
+    const catCells = mesesExibir.map(m => {
+      const v = sinal * (subs.reduce((s,sub) => s + valorChave(sub.id, m), 0) + valorChave(chaveSem, m));
+      totalGeralPorMes[m] += v;
+      return `<td>${fmtValSigned(v)}</td>`;
+    }).join('');
+    const totalCat = sinal * totalCatAno;
+    totalGeralAno += totalCat;
+    linhasHtml += `<tr class="dre-row-subtotal"><td>${c.nome} <span style="font-weight:400;color:#a8a29e;font-size:11px">(${getDfcGrupoLabel(c.grupo)})</span></td>${catCells}${mesFiltro ? '' : `<td class="dfc-col-total">${fmtValSigned(totalCat)}</td>`}</tr>`;
+
+    // Uma linha por subcategoria
+    subs.forEach(sub => {
+      const cells = mesesExibir.map(m => {
+        const v = sinal * valorChave(sub.id, m);
+        if (Math.abs(v) < 0.005) return `<td>${fmtValSigned(v)}</td>`;
+        return `<td class="dre-cell-click" onclick="abrirDetalheAscSub('${sub.id}',${m})" title="Ver lançamentos desta subcategoria">${fmtValSigned(v)}</td>`;
+      }).join('');
+      const tot = sinal * totalChaveAno(sub.id);
+      linhasHtml += `<tr><td style="padding-left:26px;color:#57534e;">↳ ${sub.nome}</td>${cells}${mesFiltro ? '' : `<td class="dfc-col-total">${fmtValSigned(tot)}</td>`}</tr>`;
+    });
+
+    // Linha "(Sem subcategoria)" — só quando existe valor sobrando
+    if (temSemSub) {
+      const cells = mesesExibir.map(m => {
+        const v = sinal * valorChave(chaveSem, m);
+        if (Math.abs(v) < 0.005) return `<td>${fmtValSigned(v)}</td>`;
+        return `<td class="dre-cell-click" onclick="abrirDetalheAscSub('${chaveSem}',${m})" title="Ver lançamentos sem subcategoria">${fmtValSigned(v)}</td>`;
+      }).join('');
+      const tot = sinal * totalChaveAno(chaveSem);
+      linhasHtml += `<tr><td style="padding-left:26px;color:#a8a29e;font-style:italic;">↳ (Sem subcategoria)</td>${cells}${mesFiltro ? '' : `<td class="dfc-col-total">${fmtValSigned(tot)}</td>`}</tr>`;
+    }
+  });
+
+  if (!temLinha) {
+    wrap.innerHTML = '<div class="empty-state" style="padding:32px">Nenhum lançamento encontrado no período para as subcategorias cadastradas.</div>';
+    return;
+  }
+
+  const totalCells = mesesExibir.map(m => `<td>${fmtValSigned(totalGeralPorMes[m])}</td>`).join('');
+  linhasHtml += `<tr class="dre-row-final"><td>TOTAL GERAL</td>${totalCells}${mesFiltro ? '' : `<td class="dfc-col-total">${fmtValSigned(totalGeralAno)}</td>`}</tr>`;
+
+  wrap.innerHTML = `<table class="dfc-table">
+    <thead><tr><th>Categoria / Subcategoria</th>${mesesHeader}</tr></thead>
+    <tbody>${linhasHtml}</tbody>
+  </table>`;
+}
+
+// Drill-down: clique em um valor abre os lançamentos que o compõem.
+// Reutiliza o mesmo modal já usado pela Análise por Categoria.
+function abrirDetalheAscSub(chave, mes) {
+  const lista = (_ascItensCache[mes] && _ascItensCache[mes][chave]) ? [..._ascItensCache[mes][chave]] : [];
+  const titulo = chave.startsWith('cat::')
+    ? `${getDfcCatNome(chave.slice(5))} — (Sem subcategoria)`
+    : `${getDfcCatNome(getDfcSubCat(chave))} → ${getDfcSubNome(chave)}`;
+  const itens = lista.sort((a,b) => (a.data||'').localeCompare(b.data||''));
+
+  const titleEl = document.getElementById('dre-detalhe-title');
+  if (titleEl) titleEl.textContent = `${titulo} — ${meses[mes]} / ${_ascAnoCache}`;
+
+  const total = itens.reduce((s,it) => s + (it.valor||0), 0);
+  const confirmado = itens.filter(it => it.status === 'Recebido' || it.status === 'Pago')
+    .reduce((s,it) => s + (it.valor||0), 0);
+  const pendente = total - confirmado;
+
+  const kpisEl = document.getElementById('dre-detalhe-kpis');
+  if (kpisEl) {
+    kpisEl.innerHTML = `
+      <div class="card kpi"><div class="kpi-val">${itens.length}</div><div class="kpi-lbl">Lançamentos</div></div>
+      <div class="card kpi"><div class="kpi-val">${fmtBRL(total)}</div><div class="kpi-lbl">Total do período</div></div>
+      <div class="card kpi"><div class="kpi-val" style="color:#166534">${fmtBRL(confirmado)}</div><div class="kpi-lbl">Já confirmado</div></div>
+      <div class="card kpi"><div class="kpi-val" style="color:#d97706">${fmtBRL(pendente)}</div><div class="kpi-lbl">Ainda pendente</div></div>`;
+  }
+
+  const tbody = document.getElementById('dre-detalhe-tbody');
+  if (tbody) {
+    tbody.innerHTML = itens.length
+      ? itens.map(it => {
+          let badge;
+          if (it.status === 'Recebido' || it.status === 'Pago') badge = `<span class="badge badge-green">${it.status}</span>`;
+          else if (it.status === 'A Receber') badge = `<span class="badge" style="background:#dbeafe;color:#1e6fad;font-weight:600">${it.status}</span>`;
+          else if (it.status === 'DFC') badge = `<span class="badge badge-blue">${it.status}</span>`;
+          else badge = `<span class="badge badge-red">${it.status}</span>`;
+          return `<tr>
+            <td>${fmtDate(it.data)}</td>
+            <td>${it.nome || '—'}</td>
+            <td>${it.prod || '—'}</td>
+            <td>${badge}</td>
+            <td style="font-family:DM Mono,monospace;text-align:right">${fmtBRL(it.valor)}</td>
+          </tr>`;
+        }).join('')
+      : '<tr><td colspan="5" class="empty-state">Nenhum lançamento encontrado.</td></tr>';
+  }
+
+  openModal('modal-dre-detalhe');
+}
+
+// Gera o PDF da Análise por Subcategoria, no mesmo layout do relatório
+// de Análise por Categoria (usa a tabela já renderizada em tela).
+function imprimirAnaliseSubcategoria() {
+  const wrap = document.getElementById('asc-tabela-wrap');
+  const table = wrap ? wrap.querySelector('table') : null;
+  if (!table) { alert('Selecione um ano para gerar o PDF.'); return; }
+
+  const anoEl = document.getElementById('asc-ano');
+  const ano = anoEl ? anoEl.value : '';
+  const titulo = 'Análise por Subcategoria' + (ano ? ' — ' + ano : '');
+
+  const cloneTable = table.cloneNode(true);
+  cloneTable.querySelectorAll('[onclick]').forEach(el => el.removeAttribute('onclick'));
+  cloneTable.querySelectorAll('.dre-cell-click').forEach(el => el.classList.remove('dre-cell-click'));
+
+  const dataHoje = new Date().toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const tableHtml = '<table>' + cloneTable.innerHTML + '</table>';
+
+  const css = [
+    '* { margin:0; padding:0; box-sizing:border-box; }',
+    '@page { size: A4 landscape; margin: 12mm; }',
+    'body { font-family:Arial,sans-serif; color:#1f2937; padding:20px 26px; font-size:11px; }',
+    '.header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid #ea580c; }',
+    '.logo { font-size:18px; font-weight:800; color:#ea580c; }',
+    '.titulo { font-size:13px; font-weight:700; margin-top:3px; }',
+    '.meta { text-align:right; font-size:9px; color:#a8a29e; line-height:1.5; }',
+    'table { width:100%; border-collapse:collapse; }',
+    'th { background:#faf9f7; padding:5px 8px; text-align:right; font-size:9px; font-weight:700; color:#57534e; text-transform:uppercase; letter-spacing:.3px; white-space:nowrap; border-bottom:2px solid #e7e5e4; }',
+    'th:first-child { text-align:left; }',
+    'td { padding:3px 8px; text-align:right; border-bottom:1px solid #faf9f7; font-family:"Courier New",monospace; font-size:10px; white-space:nowrap; }',
+    'td:first-child { text-align:left; font-family:Arial,sans-serif; font-size:10.5px; }',
+    '.dfc-col-total { background:#faf9f7; font-weight:700; }',
+    '.dre-row-subtotal td { font-weight:700; border-top:1px solid #d6d3d1; border-bottom:1px solid #d6d3d1; }',
+    '.dre-row-subtotal td:first-child { text-transform:uppercase; letter-spacing:.3px; color:#ea580c; }',
+    '.dre-row-final td { font-weight:800; font-size:11px; border-top:1.5px solid #d6d3d1; border-bottom:1.5px solid #d6d3d1; }',
+    '.dfc-val-pos { color:#166534; }',
+    '.dfc-val-neg { color:#dc2626; }',
+    '.dfc-val-zero { color:#a8a29e; }',
+    '.footer { margin-top:16px; padding-top:8px; border-top:1px solid #f5f4f2; font-size:9px; color:#a8a29e; text-align:center; }'
+  ].join('\n');
+
+  const fullHtml = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>' + titulo + ' — C@P Consultoria</title>'
+    + '<style>' + css + '</style></head><body>'
+    + '<div class="header"><div><div class="logo">C@P</div><div class="titulo">' + titulo + '</div></div>'
+    + '<div class="meta"><div>Emitido em: ' + dataHoje + '</div><div>Sistema de Gestão C@P Consultoria</div></div></div>'
+    + tableHtml
+    + '<div class="footer">C@P Consultoria — Sistema de Gestão de Compras &middot; Gerado em ' + dataHoje + '</div>'
+    + '<' + 'script>window.onload=function(){window.print()}<' + '/script>'
+    + '</body></html>';
+
+  const win = window.open('', '_blank', 'width=1200,height=760');
+  if (!win) { alert('Permita pop-ups para este site para gerar o PDF.'); return; }
+  win.document.write(fullHtml);
+  win.document.close();
+}
+
 // ── LANÇAMENTOS DFC ───────────────────────────────────────────────
 async function saveDfcLancamento() {
   const data  = document.getElementById('dfc-lan-data').value;
   const cat   = document.getElementById('dfc-lan-cat').value;
   const valor = parseFloat(document.getElementById('dfc-lan-valor').value);
   if (!data || !cat || !valor) { alert('Preencha data, categoria e valor.'); return; }
+  if (!validarSubcategoria('dfc-lan-cat','dfc-lan-subcat')) return;
   const empresa_id = empresaDoForm('dfc-lan-empresa');
   if (empresa_id === null) return;
   const rec = { id: uid(), empresa_id, data, cat, valor,
+    subcat: document.getElementById('dfc-lan-subcat') ? document.getElementById('dfc-lan-subcat').value : '',
     desc: document.getElementById('dfc-lan-desc').value,
     recorrente: document.getElementById('dfc-lan-recorrente').value,
     obs: document.getElementById('dfc-lan-obs').value };
@@ -8980,6 +9792,8 @@ async function saveDfcLancamento() {
 function clearDfcLancamento() {
   document.getElementById('dfc-lan-data').value = today();
   ['dfc-lan-cat','dfc-lan-desc','dfc-lan-obs'].forEach(id => document.getElementById(id).value = '');
+  onCategoriaChange('dfc-lan-cat','dfc-lan-subcat');
+  resetAvisoSubcat('dfc-lan-subcat');
   document.getElementById('dfc-lan-valor').value = '';
   document.getElementById('dfc-lan-recorrente').value = 'nao';
 }
@@ -9470,6 +10284,8 @@ function populateDreCatSelects() {
     el.innerHTML = opts;
     if (val) el.value = val;
   });
+  // Recarrega as subcategorias de cada select, respeitando a categoria atual
+  populateSubcatSelects();
   // Filtros de Grupo/Categoria em Lançamentos, Contas a Pagar e Contas Pagas
   popularFiltrosGrupoCategoriaTodos();
 }
@@ -11408,7 +12224,8 @@ const PAINEIS_MODAL = {
   'form-bnk':     'Nova Conta / Banco',
   'form-empresa': 'Nova Empresa',
   'form-dfccat':  'Nova Categoria',
-  'form-dfclan':  'Novo Lançamento'
+  'form-dfclan':  'Novo Lançamento',
+  'form-dfcsub':  'Nova Subcategoria'
 };
 
 let _formModalAtual = null;
