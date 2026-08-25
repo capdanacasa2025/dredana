@@ -2387,7 +2387,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Nº da Nota Fiscal</label><input id="l-nf" type="text" placeholder="000000" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group"><label class="label-add">Fornecedor<button type="button" class="btn-add-inline" title="Cadastrar novo fornecedor" onclick="abrirCadastroRapido('fornecedor','l-forn')">+</button></label><select id="l-forn"><option value="">Selecione...</option></select></div>
+      <div class="form-group"><label class="label-add">Despesas/Fornecedor<button type="button" class="btn-add-inline" title="Cadastrar nova despesa/fornecedor" onclick="abrirCadastroRapido('fornecedor','l-forn')">+</button></label><select id="l-forn"><option value="">Selecione...</option></select></div>
       <div class="form-group"><label class="label-add">Item<button type="button" class="btn-add-inline" title="Cadastrar novo item" onclick="abrirCadastroRapido('produto','l-prod')">+</button></label><select id="l-prod"><option value="">Nenhum (opcional)</option></select></div>
       <div class="form-group"><label>Valor Total (R$) *</label><input id="l-valor" type="number" step="0.01" placeholder="0,00" /></div>
     </div>
@@ -2961,7 +2961,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Nº Nota Fiscal</label><input id="edit-nf" type="text" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group"><label class="label-add">Fornecedor<button type="button" class="btn-add-inline" title="Cadastrar novo fornecedor" onclick="abrirCadastroRapido('fornecedor','edit-forn')">+</button></label><select id="edit-forn"></select></div>
+      <div class="form-group"><label class="label-add">Despesas/Fornecedor<button type="button" class="btn-add-inline" title="Cadastrar nova despesa/fornecedor" onclick="abrirCadastroRapido('fornecedor','edit-forn')">+</button></label><select id="edit-forn"></select></div>
       <div class="form-group"><label class="label-add">Item<button type="button" class="btn-add-inline" title="Cadastrar novo item" onclick="abrirCadastroRapido('produto','edit-prod')">+</button></label><select id="edit-prod"></select></div>
       <div class="form-group"><label>Valor Total</label><input id="edit-valor" type="number" step="0.01" /></div>
     </div>
@@ -12677,7 +12677,7 @@ async function importarPlanilha() {
 // O valor do mapa é o título mostrado no topo da janela.
 // ══════════════════════════════════════════
 const PAINEIS_MODAL = {
-  'form-forn':    'Novo Fornecedor',
+  'form-forn':    'Nova Despesas/Fornecedor',
   'form-cli':     'Novo Cliente',
   'form-bnk':     'Nova Conta / Banco',
   'form-empresa': 'Nova Empresa',
