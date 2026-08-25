@@ -139,6 +139,27 @@ input, select, textarea {
 input:focus, select:focus, textarea:focus { outline:none; border-color:#ea580c; background:#fff; }
 select option { background:#fff; color:#1f2937; }
 .form-group { margin-bottom:16px; }
+/* Item 7 — tela "Novo Lançamento a Pagar/Receber" mais compacta */
+.modal-compacto { padding:22px 26px; }
+.modal-compacto .grid3, .modal-compacto .grid2 { gap:12px; }
+.modal-compacto .form-group { margin-bottom:10px; }
+.modal-compacto label { margin-bottom:3px; }
+.modal-compacto input, .modal-compacto select, .modal-compacto textarea { padding:7px 11px; }
+.modal-compacto .modal-footer { margin-top:14px; padding-top:14px; }
+/* Item 6 — Botão flutuante (suspenso) de novo lançamento */
+.fab-lanc { position:fixed; right:24px; bottom:24px; z-index:900; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+.fab-lanc-main { width:56px; height:56px; border-radius:50%; border:none; cursor:pointer; background:#ea580c; color:#fff; font-size:30px; line-height:1; box-shadow:0 8px 24px rgba(234,88,12,.42); transition:.2s; }
+.fab-lanc-main:hover { background:#f97316; transform:translateY(-2px); }
+.fab-lanc.open .fab-lanc-main { transform:rotate(45deg); }
+.fab-lanc-menu { display:none; flex-direction:column; gap:8px; align-items:flex-end; }
+.fab-lanc.open .fab-lanc-menu { display:flex; }
+.fab-opt { border:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600; padding:10px 16px; border-radius:24px; box-shadow:0 4px 14px rgba(26,62,122,.18); white-space:nowrap; transition:.15s; }
+.fab-opt-pagar { background:#fff; color:#ea580c; border:1.5px solid #fed7aa; }
+.fab-opt-receber { background:#fff; color:#16a34a; border:1.5px solid #bbf7d0; }
+.fab-opt-ocultar { background:#fff; color:#78716c; border:1.5px solid #e7e5e4; font-weight:500; }
+.fab-opt:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(26,62,122,.24); }
+.fab-lanc-restore { position:fixed; right:0; bottom:90px; z-index:900; background:#ea580c; color:#fff; border:none; border-radius:20px 0 0 20px; padding:8px 12px; font-size:12px; font-weight:600; cursor:pointer; box-shadow:0 4px 14px rgba(234,88,12,.35); opacity:.85; transition:.15s; }
+.fab-lanc-restore:hover { opacity:1; }
 .btn { padding:9px 20px; border-radius:var(--radius); border:none; cursor:pointer; font-size:13px; font-weight:600; font-family:inherit; transition:.15s; }
 .btn-primary { background:#ea580c; color:#fff; }
 .btn-primary:hover { background:#f97316; }
@@ -710,11 +731,11 @@ th.ef-th { padding:8px 8px 8px 12px; }
         </div>
         <div class="nav-sub-item" onclick="showPage('fornecedores')" id="nav-fornecedores">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Fornecedores
+          Despesas/Fornecedor
         </div>
         <div class="nav-sub-item" onclick="showPage('produtos')" id="nav-produtos">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-          Produtos (Compra)
+          Item (Compra)
         </div>
         <div class="nav-sub-item" onclick="showPage('lancamentos')" id="nav-lancamentos">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
@@ -776,11 +797,11 @@ th.ef-th { padding:8px 8px 8px 12px; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
           Categorias
         </div>
-        <div class="nav-sub-item" onclick="showPage('dfc-subcategorias')" id="nav-dfc-subcategorias">
+        <div class="nav-sub-item" onclick="showPage('dfc-subcategorias')" id="nav-dfc-subcategorias" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><polyline points="3 6 4 7 6 5"/><polyline points="3 12 4 13 6 11"/><polyline points="3 18 4 19 6 17"/></svg>
           Subcategorias
         </div>
-        <div class="nav-sub-item" onclick="showPage('dfc-lancamentos')" id="nav-dfc-lancamentos">
+        <div class="nav-sub-item" onclick="showPage('dfc-lancamentos')" id="nav-dfc-lancamentos" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
           Lançamentos
         </div>
@@ -800,7 +821,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
           Análise por Categoria
         </div>
-        <div class="nav-sub-item" onclick="showPage('dre-analise-subcat')" id="nav-dre-analise-subcat">
+        <div class="nav-sub-item" onclick="showPage('dre-analise-subcat')" id="nav-dre-analise-subcat" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           Análise por Subcategoria
         </div>
@@ -838,7 +859,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
       </div>
       <div class="form-panel" id="form-forn" style="margin-bottom:0">
       <div class="card">
-        <div class="card-title">Novo Fornecedor</div>
+        <div class="card-title">Nova Despesas/Fornecedor</div>
         <div class="grid3">
           <div class="form-group"><label>Razão Social / Nome *</label><input id="f-nome" type="text" placeholder="Nome do fornecedor" /></div>
           <div class="form-group"><label>CNPJ / CPF</label><input id="f-cnpj" type="text" placeholder="00.000.000/0001-00" /></div>
@@ -857,7 +878,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
         </div>
         <div class="form-group"><label>Observações</label><textarea id="f-obs" rows="2" placeholder="Informações adicionais..."></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="saveFornecedor()">Salvar Fornecedor</button>
+          <button class="btn btn-primary" onclick="saveFornecedor()">Salvar</button>
           <button class="btn btn-secondary" onclick="clearFornecedor()">Limpar</button>
         </div>
       </div>
@@ -874,7 +895,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
     <!-- ══ PRODUTOS ══ -->
     <div class="page" id="page-produtos">
       <div class="page-header">
-        <div><div class="page-title">Produtos</div><div class="page-sub" style="margin-bottom:0">Cadastro e gestão de produtos</div></div>
+        <div><div class="page-title">Itens</div><div class="page-sub" style="margin-bottom:0">Cadastro e gestão de itens</div></div>
         <button class="btn-novo" id="btn-novo-prod" onclick="abrirNovoProduto()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo
         </button>
@@ -882,9 +903,9 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <!-- MODAL: Novo Produto -->
       <div class="modal-overlay" id="modal-novo-prod">
         <div class="modal">
-          <div class="modal-title">Novo Produto</div>
+          <div class="modal-title">Novo Item</div>
           <div class="grid3">
-            <div class="form-group"><label>Nome do Produto *</label><input id="p-nome" type="text" placeholder="Descrição do produto" /></div>
+            <div class="form-group"><label>Nome do Item *</label><input id="p-nome" type="text" placeholder="Descrição do item" /></div>
             <div class="form-group"><label>Código / SKU</label><input id="p-sku" type="text" placeholder="SKU-001" /></div>
             <div class="form-group"><label>Unidade de Medida</label>
               <select id="p-unidade">
@@ -983,7 +1004,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
           <div style="align-self:flex-end"><button class="btn btn-secondary" onclick="clearLancamentoFiltros()">Limpar Filtros</button></div>
         </div>
         <div class="table-scroll"><table><thead><tr id="th-lancamentos-row">
-          <th>Data Compra</th><th>Fornecedor</th><th>Produto</th><th>Categoria</th><th>Valor</th><th>Parcelas</th>
+          <th>Data Compra</th><th>Fornecedor</th><th>Item</th><th>Categoria</th><th>Valor</th><th>Parcelas</th>
           <th>Prev. Pgto</th><th>Lead Time</th><th>NF</th><th>Financeiro</th><th>Pago</th><th>Ações</th>
         </tr></thead><tbody id="tb-lancamentos"><tr><td colspan="12" class="empty-state">Nenhum lançamento registrado.</td></tr></tbody></table></div>
       </div>
@@ -2352,22 +2373,22 @@ th.ef-th { padding:8px 8px 8px 12px; }
 <!-- ══ MODAL EDITAR CLIENTE ══ -->
 <!-- ══ MODAL CRIAR LANÇAMENTO — PAGAMENTO ══ -->
 <div class="modal-overlay" id="modal-novo-lanc">
-  <div class="modal" style="width:720px;">
+  <div class="modal modal-compacto" style="width:720px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
       <div class="modal-title" style="margin-bottom:0;">📦 Novo Lançamento — Pagamento</div>
-      <button onclick="closeModal('modal-novo-lanc')" style="background:none;border:none;cursor:pointer;color:#a8a29e;font-size:22px;line-height:1;padding:4px;" title="Fechar">✕</button>
+      <button onclick="fecharModalLanc()" style="background:none;border:none;cursor:pointer;color:#a8a29e;font-size:22px;line-height:1;padding:4px;" title="Fechar">✕</button>
     </div>
     <div class="grid3">
       <div class="form-group" style="display:none"><label>Empresa *</label><select id="l-empresa" class="sel-empresa"><option value="">Selecione...</option></select></div>
     </div>
     <div class="grid3">
-      <div class="form-group"><label>Data da Compra *</label><input id="l-dtcompra" type="date" /></div>
-      <div class="form-group"><label>Previsão de Pagamento</label><input id="l-dtprev" type="date" /></div>
+      <div class="form-group"><label>Data da Compra *</label><input id="l-dtcompra" type="date" onchange="refreshParcelaDatesIfOpen('l-parcelas','l-parcela-dates')" /></div>
+      <div class="form-group"><label>Previsão de Pagamento</label><input id="l-dtprev" type="date" onchange="refreshParcelaDatesIfOpen('l-parcelas','l-parcela-dates')" /></div>
       <div class="form-group"><label>Nº da Nota Fiscal</label><input id="l-nf" type="text" placeholder="000000" /></div>
     </div>
     <div class="grid3">
       <div class="form-group"><label class="label-add">Fornecedor<button type="button" class="btn-add-inline" title="Cadastrar novo fornecedor" onclick="abrirCadastroRapido('fornecedor','l-forn')">+</button></label><select id="l-forn"><option value="">Selecione...</option></select></div>
-      <div class="form-group"><label class="label-add">Produto<button type="button" class="btn-add-inline" title="Cadastrar novo produto" onclick="abrirCadastroRapido('produto','l-prod')">+</button></label><select id="l-prod"><option value="">Nenhum (opcional)</option></select></div>
+      <div class="form-group"><label class="label-add">Item<button type="button" class="btn-add-inline" title="Cadastrar novo item" onclick="abrirCadastroRapido('produto','l-prod')">+</button></label><select id="l-prod"><option value="">Nenhum (opcional)</option></select></div>
       <div class="form-group"><label>Valor Total (R$) *</label><input id="l-valor" type="number" step="0.01" placeholder="0,00" /></div>
     </div>
     <div class="grid3">
@@ -2433,7 +2454,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
     </div>
     <div class="form-group"><label>Observações</label><textarea id="l-obs" rows="2" placeholder="Informações adicionais..."></textarea></div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modal-novo-lanc')">Cancelar</button>
+      <button class="btn btn-secondary" onclick="fecharModalLanc()">Cancelar</button>
       <button class="btn btn-secondary" onclick="clearLancamento()">Limpar</button>
       <button class="btn btn-primary" onclick="saveLancamento()">Salvar Lançamento</button>
     </div>
@@ -2451,8 +2472,8 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group" style="display:none"><label>Empresa *</label><select id="lr-empresa" class="sel-empresa"><option value="">Selecione...</option></select></div>
     </div>
     <div class="grid3">
-      <div class="form-group"><label>Data da Venda *</label><input id="lr-dtvenda" type="date" /></div>
-      <div class="form-group"><label>Previsão de Recebimento</label><input id="lr-dtprev" type="date" /></div>
+      <div class="form-group"><label>Data da Venda *</label><input id="lr-dtvenda" type="date" onchange="refreshParcelaDatesIfOpen('lr-parcelas','lr-parcela-dates')" /></div>
+      <div class="form-group"><label>Previsão de Recebimento</label><input id="lr-dtprev" type="date" onchange="refreshParcelaDatesIfOpen('lr-parcelas','lr-parcela-dates')" /></div>
       <div class="form-group"><label>Nº da Nota Fiscal</label><input id="lr-nf" type="text" placeholder="000000" /></div>
     </div>
     <div class="grid3">
@@ -2941,7 +2962,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
     </div>
     <div class="grid3">
       <div class="form-group"><label class="label-add">Fornecedor<button type="button" class="btn-add-inline" title="Cadastrar novo fornecedor" onclick="abrirCadastroRapido('fornecedor','edit-forn')">+</button></label><select id="edit-forn"></select></div>
-      <div class="form-group"><label class="label-add">Produto<button type="button" class="btn-add-inline" title="Cadastrar novo produto" onclick="abrirCadastroRapido('produto','edit-prod')">+</button></label><select id="edit-prod"></select></div>
+      <div class="form-group"><label class="label-add">Item<button type="button" class="btn-add-inline" title="Cadastrar novo item" onclick="abrirCadastroRapido('produto','edit-prod')">+</button></label><select id="edit-prod"></select></div>
       <div class="form-group"><label>Valor Total</label><input id="edit-valor" type="number" step="0.01" /></div>
     </div>
     <div class="grid3">
@@ -3897,6 +3918,7 @@ async function trackUserActivity() {
 function doLogout() {
   supabaseAuthLogout();
   currentUser = null;
+  if (typeof atualizarFabLanc === 'function') atualizarFabLanc();
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-error').style.display = 'none';
@@ -4044,9 +4066,12 @@ function abrirModalLanc() {
   populateBancoSelects();
   populateFormasPagSelects();
   populateDreCatSelects();
+  clearLancamento();            // abre sempre com a tela limpa
   openModal('modal-novo-lanc');
 }
-function fecharModalLanc() { closeModal('modal-novo-lanc'); }
+// Fecha SEMPRE limpando os campos — evita que dados de um lançamento
+// anterior fiquem na tela ao reabrir (bug do item 4).
+function fecharModalLanc() { clearLancamento(); closeModal('modal-novo-lanc'); }
 
 function abrirModalLancReceber() {
   populateClienteSelects();
@@ -4587,8 +4612,8 @@ function agendarTrocaFraseDoDia() {
 // sem sair do lançamento que está sendo digitado.
 // ══════════════════════════════════════════
 const CAD_RAPIDO = {
-  fornecedor: { titulo:'Novo Fornecedor',        label:'Nome do fornecedor *', tabela:'fornecedores',   lista:'fornecedores' },
-  produto:    { titulo:'Novo Produto (Compra)',  label:'Nome do produto *',    tabela:'produtos',       lista:'produtos' },
+  fornecedor: { titulo:'Novas Despesas/Fornecedor', label:'Nome do fornecedor *', tabela:'fornecedores',   lista:'fornecedores' },
+  produto:    { titulo:'Novo Item (Compra)',     label:'Nome do Item *',       tabela:'produtos',       lista:'produtos' },
   cliente:    { titulo:'Novo Cliente',           label:'Nome do cliente *',    tabela:'clientes',       lista:'clientes' },
   prodvenda:  { titulo:'Novo Produto de Venda',  label:'Nome do produto *',    tabela:'prodvenda',      lista:'prodvenda' },
   categoria:  { titulo:'Nova Categoria',         label:'Nome da categoria *',  tabela:'dfc_categorias', lista:'dfc_cats' }
@@ -7976,6 +8001,43 @@ function toggleParcelaDates(selectId, containerid) {
         <input type="number" step="0.01" min="0" id="${containerid}-v${i+1}" placeholder="0,00" value="${valorSugerido}" style="font-size:12px;padding:6px 9px;width:100%" oninput="syncTotalParcelaValores('${containerid}',${n},'${selectId}')" />
       </div>
     </div>`).join('');
+  // Item 5: já preenche automaticamente as datas de vencimento (1 por mês)
+  // a partir da data-base, deixando tudo editável.
+  _preencherDatasParcelas(formRoot, containerid, n);
+}
+
+// Descobre a data-base para gerar o vencimento das parcelas:
+// prioriza a "Previsão de Pagamento/Recebimento"; se estiver vazia, usa a
+// "Data da Compra/Venda". Retorna '' se nenhuma estiver preenchida.
+function _baseDateParcela(formRoot) {
+  if (!formRoot) return '';
+  let el = formRoot.querySelector('input[type="date"][id*="dtprev"]');
+  if (el && el.value) return el.value;
+  el = formRoot.querySelector('input[type="date"][id*="dtcompra"], input[type="date"][id*="dtvenda"]');
+  if (el && el.value) return el.value;
+  return '';
+}
+
+// Preenche SÓ os campos de data que estão vazios, mês a mês, sem sobrescrever
+// datas que o usuário já tenha digitado manualmente.
+function _preencherDatasParcelas(formRoot, containerid, n) {
+  const base = _baseDateParcela(formRoot);
+  if (!base) return;
+  for (let i = 1; i <= n; i++) {
+    const de = document.getElementById(`${containerid}-p${i}`);
+    if (de && !de.value) de.value = parcelaVencimento(base, i, n);
+  }
+}
+
+// Reaplica as datas automáticas quando o usuário muda a data-base DEPOIS de já
+// ter escolhido o número de parcelas (grade aberta). Preserva edições manuais.
+function refreshParcelaDatesIfOpen(selectId, containerid) {
+  const sel = document.getElementById(selectId);
+  const cont = document.getElementById(containerid);
+  if (!sel || !cont || cont.style.display === 'none') return;
+  const n = parseInt(sel.value) || 1;
+  if (n <= 1) return;
+  _preencherDatasParcelas(cont.closest('.card, .modal'), containerid, n);
 }
 
 function syncTotalParcelaValores(containerid, n, selectId) {
@@ -8108,6 +8170,12 @@ function applyNavPermissions() {
     if (isAdmin) { item.style.display = ''; return; }
     item.style.display = allowed.includes(pg) ? '' : 'none';
   });
+  // Telas desativadas por decisão do cliente — somem do menu para todos os
+  // perfis (inclusive admin), mesmo que a permissão exista.
+  ['dfc-subcategorias','dfc-lancamentos','dre-analise-subcat'].forEach(pg => {
+    const el = document.getElementById('nav-' + pg);
+    if (el) el.style.display = 'none';
+  });
   // Ocultar cabeçalho do grupo se todos os itens estiverem ocultos
   ['grp-pagar','grp-receber','grp-dfc','grp-dre'].forEach(grpId => {
     const grp = document.getElementById(grpId);
@@ -8121,6 +8189,7 @@ function applyNavPermissions() {
     const first = document.querySelector('.nav-item[style=""]');
     if (first) first.click();
   }
+  if (typeof atualizarFabLanc === 'function') atualizarFabLanc();
 }
 
 async function renderUsuariosAdmin() {
@@ -14245,6 +14314,70 @@ window.APP_BUILD = '2026-08-10 · planeta-flores-empresa-unica';
 document.querySelectorAll('.modal-overlay').forEach(ov => {
   ov.addEventListener('click', e => { if(e.target === ov) ov.classList.remove('open'); });
 });
+
+// ══════════════════════════════════════════
+// Item 6 — Botão flutuante de novo lançamento (a pagar / a receber)
+// ══════════════════════════════════════════
+const FAB_LANC_HIDE_KEY = '477_fab_lanc_hidden';
+function toggleFabMenu() {
+  const fab = document.getElementById('fab-lanc');
+  if (fab) fab.classList.toggle('open');
+}
+function fabNovo(tipo) {
+  const fab = document.getElementById('fab-lanc');
+  if (fab) fab.classList.remove('open');
+  if (tipo === 'pagar') abrirModalLanc();
+  else abrirModalLancReceber();
+}
+function ocultarFabLanc() {
+  try { localStorage.setItem(FAB_LANC_HIDE_KEY, '1'); } catch(e) {}
+  atualizarFabLanc();
+}
+function mostrarFabLanc() {
+  try { localStorage.removeItem(FAB_LANC_HIDE_KEY); } catch(e) {}
+  atualizarFabLanc();
+}
+// Mostra/esconde o botão conforme login, permissões do perfil e a
+// preferência de ocultar (guardada no navegador).
+function atualizarFabLanc() {
+  const fab = document.getElementById('fab-lanc');
+  const restore = document.getElementById('fab-lanc-restore');
+  if (!fab || !restore) return;
+  if (!currentUser) { fab.style.display='none'; restore.style.display='none'; fab.classList.remove('open'); return; }
+  const isAdmin = currentUser.role === 'admin';
+  const pages = currentUser.pages || [];
+  const podePagar   = isAdmin || pages.includes('lancamentos');
+  const podeReceber = isAdmin || pages.includes('lancreceber');
+  const optPagar   = fab.querySelector('.fab-opt-pagar');
+  const optReceber = fab.querySelector('.fab-opt-receber');
+  if (optPagar)   optPagar.style.display   = podePagar   ? '' : 'none';
+  if (optReceber) optReceber.style.display = podeReceber ? '' : 'none';
+  if (!podePagar && !podeReceber) { fab.style.display='none'; restore.style.display='none'; return; }
+  let escondido = false;
+  try { escondido = localStorage.getItem(FAB_LANC_HIDE_KEY) === '1'; } catch(e) {}
+  if (escondido) {
+    fab.style.display='none'; fab.classList.remove('open'); restore.style.display='';
+  } else {
+    fab.style.display='flex'; restore.style.display='none';
+  }
+}
+// Fecha o menu do botão ao clicar fora dele
+document.addEventListener('click', e => {
+  const fab = document.getElementById('fab-lanc');
+  if (fab && fab.classList.contains('open') && !fab.contains(e.target)) fab.classList.remove('open');
+});
 </script>
+
+<!-- Item 6 — Botão flutuante (suspenso) de novo lançamento -->
+<div id="fab-lanc" class="fab-lanc" style="display:none">
+  <div id="fab-lanc-menu" class="fab-lanc-menu">
+    <button type="button" class="fab-opt fab-opt-pagar" onclick="fabNovo('pagar')">📦 Lançamento a Pagar</button>
+    <button type="button" class="fab-opt fab-opt-receber" onclick="fabNovo('receber')">💰 Lançamento a Receber</button>
+    <button type="button" class="fab-opt fab-opt-ocultar" onclick="ocultarFabLanc()">🚫 Ocultar botão</button>
+  </div>
+  <button type="button" id="fab-lanc-main" class="fab-lanc-main" onclick="toggleFabMenu()" title="Novo lançamento">＋</button>
+</div>
+<button type="button" id="fab-lanc-restore" class="fab-lanc-restore" style="display:none" onclick="mostrarFabLanc()" title="Mostrar botão de novo lançamento">＋ Lançamento</button>
+
 </body>
 </html>
