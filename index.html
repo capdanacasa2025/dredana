@@ -361,6 +361,9 @@ th.ef-th { padding:8px 8px 8px 12px; }
 #dre-tabela-wrap .dre-row-cat { background:#fafaf9; }
 #dre-tabela-wrap .dre-row-cat td { padding-top:2px; padding-bottom:2px; border-top:none; }
 #dre-tabela-wrap .dre-row-cat:hover { background:#f5f4f2; }
+/* Item 3: coluna de % ao lado de cada mês (mais estreita e discreta) */
+#dre-tabela-wrap .dre-th-pct { font-size:9px; color:#a8a29e; background:#f5f4f2; }
+#dre-tabela-wrap .dre-pct-cell { font-size:10px; color:#a8a29e; font-style:italic; border-left:1px dashed #f0efec; }
 /* ── Item 4: fonte mais bonita, escopada só ao DRE ── */
 #dre-tabela-wrap .dfc-table { font-family:'Sora',sans-serif; }
 #dre-tabela-wrap .dfc-table td { font-family:'DM Mono',monospace; font-feature-settings:'tnum' 1; letter-spacing:.2px; }
@@ -709,6 +712,10 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="nav-item" onclick="showPage('fluxo-futuro')" id="nav-fluxo-futuro">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
         Fluxo de Caixa Futuro
+      </div>
+      <div class="nav-item" onclick="showPage('fluxo-diario')" id="nav-fluxo-diario">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Fluxo de Caixa Diário
       </div>
       <div class="nav-item" onclick="showPage('dfc-demonstrativo')" id="nav-dfc-demonstrativo" style="margin-bottom:8px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -1857,6 +1864,15 @@ th.ef-th { padding:8px 8px 8px 12px; }
             <input type="checkbox" id="dre-somente-classificados" onchange="renderDre()" />
             Considerar apenas lançamentos com Categoria definida
           </label>
+          <span style="font-size:11px;color:#a8a29e;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">Base:</span>
+          <select id="dre-base" onchange="renderDre()" style="width:150px;padding:6px 10px;font-size:13px;" title="Competência = data da compra/venda; Vencimento = data prevista de pagamento/recebimento">
+            <option value="competencia">Competência</option>
+            <option value="vencimento">Vencimento</option>
+          </select>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+            <input type="checkbox" id="dre-mostrar-percent" checked onchange="renderDre()" />
+            Mostrar % por mês
+          </label>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f5f4f2;">
           <span style="font-size:11px;color:#a8a29e;font-weight:600;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;">Meses visíveis:</span>
@@ -2167,6 +2183,41 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div id="fluxo-futuro-wrap"></div>
     </div>
 
+    <!-- ══ FLUXO DE CAIXA DIÁRIO ══ -->
+    <div class="page" id="page-fluxo-diario">
+      <div class="page-header"><div><div class="page-title">Fluxo de Caixa Diário</div><div class="page-sub" style="margin-bottom:0">Receita, despesa e resultado de cada dia do mês</div></div></div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="filter-row" style="align-items:flex-end">
+          <div class="form-group"><label>Ano</label><select id="fd-ano" onchange="renderFluxoDiario()"></select></div>
+          <div class="form-group"><label>Mês</label>
+            <select id="fd-mes" onchange="renderFluxoDiario()">
+              <option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option>
+              <option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option>
+              <option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option>
+              <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>&nbsp;</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button class="btn btn-secondary btn-sm" onclick="fdMudarMes(-1)" title="Mês anterior">◄</button>
+              <button class="btn btn-secondary btn-sm" onclick="fdMesAtual()">Mês atual</button>
+              <button class="btn btn-secondary btn-sm" onclick="fdMudarMes(1)" title="Próximo mês">►</button>
+            </div>
+          </div>
+          <div class="form-group"><label>Base</label>
+            <select id="fd-base" onchange="renderFluxoDiario()">
+              <option value="realizado">Realizado (o que entrou e saiu)</option>
+              <option value="previsto">Previsto (por vencimento)</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Conta / Banco</label>
+            <select id="fd-banco" onchange="renderFluxoDiario()"><option value="">Todas as Contas</option></select>
+          </div>
+        </div>
+      </div>
+      <div id="fluxo-diario-wrap"></div>
+    </div>
+
     <!-- ══ DASHBOARD ══ -->
     <div class="page active" id="page-dashboard">
       <div class="page-title">Dashboard <span class="empresa-tag"></span></div>
@@ -2433,8 +2484,11 @@ th.ef-th { padding:8px 8px 8px 12px; }
         <select id="l-financeiro"><option value="nao">Não</option><option value="sim">Sim</option></select>
       </div>
       <div class="form-group"><label>Pago?</label>
-        <select id="l-pago"><option value="nao">Não</option><option value="sim">Sim</option></select>
+        <select id="l-pago" onchange="toggleDataPagamento()"><option value="nao">Não</option><option value="sim">Sim</option></select>
       </div>
+    </div>
+    <div id="l-dtpago-bloco" class="grid3" style="display:none">
+      <div class="form-group"><label>Data de Pagamento <span style="color:#dc2626">*</span></label><input id="l-dtpago" type="date" /></div>
     </div>
     <div id="l-parcela-dates" style="display:none;margin-bottom:16px;">
       <div style="font-size:12px;font-weight:600;color:#ea580c;margin-bottom:10px;padding:8px 12px;background:#fff1e6;border-radius:6px;border-left:3px solid #ea580c;">
@@ -2506,8 +2560,11 @@ th.ef-th { padding:8px 8px 8px 12px; }
         <select id="lr-financeiro"><option value="nao">Não</option><option value="sim">Sim</option></select>
       </div>
       <div class="form-group"><label>Recebido?</label>
-        <select id="lr-recebido"><option value="nao">Não</option><option value="sim">Sim</option></select>
+        <select id="lr-recebido" onchange="toggleDataRecebimento()"><option value="nao">Não</option><option value="sim">Sim</option></select>
       </div>
+    </div>
+    <div id="lr-dtrecebido-bloco" class="grid3" style="display:none">
+      <div class="form-group"><label>Data de Recebimento <span style="color:#dc2626">*</span></label><input id="lr-dtrecebido" type="date" /></div>
     </div>
     <div id="lr-parcela-dates" style="display:none;margin-bottom:16px;">
       <div style="font-size:12px;font-weight:600;color:#16a34a;margin-bottom:10px;padding:8px 12px;background:#dcfce7;border-radius:6px;border-left:3px solid #16a34a;">
@@ -3287,6 +3344,29 @@ th.ef-th { padding:8px 8px 8px 12px; }
   </div>
 </div>
 
+<!-- ══ MODAL DRILL-DOWN DE LANÇAMENTOS (DRE / DFC / Fluxo Futuro / Fluxo Diário) — com editar/excluir ══ -->
+<div class="modal-overlay" id="modal-lanc-drill">
+  <div class="modal" style="width:900px;max-width:94vw;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="modal-title" id="lanc-drill-title" style="margin-bottom:0;">Lançamentos</div>
+      <button onclick="closeModal('modal-lanc-drill')" style="background:none;border:none;cursor:pointer;color:#a8a29e;font-size:22px;line-height:1;padding:4px;" title="Fechar">✕</button>
+    </div>
+    <div class="grid4" id="lanc-drill-kpis" style="margin-bottom:16px;"></div>
+    <div style="max-height:50vh;overflow:auto">
+      <table class="dfc-table" style="width:100%">
+        <thead><tr>
+          <th style="text-align:left">Data</th><th style="text-align:left">Fornecedor / Cliente</th>
+          <th style="text-align:left">Produto</th><th>Situação</th><th>Valor</th><th style="text-align:center">Ações</th>
+        </tr></thead>
+        <tbody id="lanc-drill-tbody"></tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-lanc-drill')">Fechar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ MODAL EDITAR CATEGORIA (Contas Pagas) ══ -->
 <div class="modal-overlay" id="modal-editar-categoria-pago">
   <div class="modal" style="width:420px;">
@@ -3326,6 +3406,7 @@ const PAGES_CONFIG = [
   { id:'bancos',            label:'Bancos / Caixas',     grupo:'pagar'   },
   { id:'transferencias',    label:'Transferência entre Contas', grupo:'pagar' },
   { id:'fluxo-futuro',      label:'Fluxo de Caixa Futuro',grupo:'pagar'  },
+  { id:'fluxo-diario',      label:'Fluxo de Caixa Diário',grupo:'pagar'  },
   { id:'fornecedores',      label:'Fornecedores',        grupo:'pagar'   },
   { id:'produtos',          label:'Produtos (Compra)',   grupo:'pagar'   },
   { id:'lancamentos',       label:'Lançamentos (Compra)',grupo:'pagar'   },
@@ -3965,6 +4046,7 @@ function showPage(p) {
   if (p === 'bancos')         { renderBancos(); renderFluxoBancoDiario(); }
   if (p === 'transferencias') { populateTransfSelects(); renderTransferencias(); }
   if (p === 'fluxo-futuro')   renderFluxoFuturo();
+  if (p === 'fluxo-diario')   renderFluxoDiario();
   if (p === 'fornecedores')   renderFornecedores();
   if (p === 'produtos')       renderProdutos();
   if (p === 'clientes')       renderClientes();
@@ -4003,6 +4085,7 @@ function renderPaginaAtual() {
   if (p === 'bancos')         { renderBancos(); renderFluxoBancoDiario(); }
   if (p === 'transferencias') { populateTransfSelects(); renderTransferencias(); }
   if (p === 'fluxo-futuro')   renderFluxoFuturo();
+  if (p === 'fluxo-diario')   renderFluxoDiario();
   if (p === 'fornecedores')   renderFornecedores();
   if (p === 'produtos')       renderProdutos();
   if (p === 'clientes')       renderClientes();
@@ -4059,6 +4142,30 @@ function carregarModoMenu() {
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Item 7 — mostra/oculta o campo "Data de Pagamento" conforme o "Pago?".
+function toggleDataPagamento() {
+  const sel = document.getElementById('l-pago');
+  const bloco = document.getElementById('l-dtpago-bloco');
+  if (!sel || !bloco) return;
+  const mostrar = sel.value === 'sim';
+  bloco.style.display = mostrar ? '' : 'none';
+  const inp = document.getElementById('l-dtpago');
+  if (mostrar && inp && !inp.value) inp.value = today();
+  if (!mostrar && inp) inp.value = '';
+}
+
+// Item 8 — mostra/oculta o campo "Data de Recebimento" conforme o "Recebido?".
+function toggleDataRecebimento() {
+  const sel = document.getElementById('lr-recebido');
+  const bloco = document.getElementById('lr-dtrecebido-bloco');
+  if (!sel || !bloco) return;
+  const mostrar = sel.value === 'sim';
+  bloco.style.display = mostrar ? '' : 'none';
+  const inp = document.getElementById('lr-dtrecebido');
+  if (mostrar && inp && !inp.value) inp.value = today();
+  if (!mostrar && inp) inp.value = '';
+}
 
 function abrirModalLanc() {
   populateFornSelects();
@@ -4977,6 +5084,9 @@ async function saveLancamento() {
   const pago = document.getElementById('l-pago').value;
   const banco = document.getElementById('l-banco').value;
   if (!validarBancoObrigatorio(pago, banco)) return;
+  // Item 7 — não permitir lançar como pago sem a data de pagamento.
+  const dtpago = document.getElementById('l-dtpago') ? document.getElementById('l-dtpago').value : '';
+  if (pago === 'sim' && !dtpago) { alert('Informe a data de pagamento.'); return; }
   const empresa_id = empresaDoForm('l-empresa');
   if (empresa_id === null) return;
 
@@ -4986,6 +5096,7 @@ async function saveLancamento() {
     forn, prod, valor,
     financeiro: document.getElementById('l-financeiro').value,
     pago,
+    dtpago: pago === 'sim' ? dtpago : '',
     tipo_pag: document.getElementById('l-tipo-pag').value,
     banco,
     cat_dre: document.getElementById('l-catdre') ? document.getElementById('l-catdre').value : '',
@@ -5049,6 +5160,9 @@ function clearLancamento() {
   document.getElementById('l-parcelas').value='1';
   document.getElementById('l-financeiro').value='nao';
   document.getElementById('l-pago').value='nao';
+  // Item 7 — reseta e oculta a data de pagamento
+  if (document.getElementById('l-dtpago')) document.getElementById('l-dtpago').value='';
+  if (document.getElementById('l-dtpago-bloco')) document.getElementById('l-dtpago-bloco').style.display='none';
   // Reset parcela dates
   const container = document.getElementById('l-parcela-dates');
   const grid = document.getElementById('l-parcela-dates-grid');
@@ -8578,6 +8692,9 @@ async function saveLancReceber() {
   const recebido=document.getElementById('lr-recebido').value;
   const banco=document.getElementById('lr-banco').value;
   if (!validarBancoObrigatorio(recebido, banco)) return;
+  // Item 8 — não permitir lançar como recebido sem a data de recebimento.
+  const dtrecebido = document.getElementById('lr-dtrecebido') ? document.getElementById('lr-dtrecebido').value : '';
+  if (recebido === 'sim' && !dtrecebido) { alert('Informe a data de recebimento.'); return; }
   const empresa_id = empresaDoForm('lr-empresa');
   if (empresa_id === null) return;
   const parcelas=parseInt(document.getElementById('lr-parcelas').value)||1;
@@ -8588,6 +8705,7 @@ async function saveLancReceber() {
     valor, parcelas,
     financeiro:document.getElementById('lr-financeiro').value,
     recebido,
+    dtrecebido: recebido === 'sim' ? dtrecebido : '',
     tipo_pag:document.getElementById('lr-tipo-pag').value,
     banco,
     cat_dre: document.getElementById('lr-catdre') ? document.getElementById('lr-catdre').value : '',
@@ -8608,6 +8726,9 @@ function clearLancReceber() {
   document.getElementById('lr-parcelas').value='1';
   document.getElementById('lr-financeiro').value='nao';
   document.getElementById('lr-recebido').value='nao';
+  // Item 8 — reseta e oculta a data de recebimento
+  if (document.getElementById('lr-dtrecebido')) document.getElementById('lr-dtrecebido').value='';
+  if (document.getElementById('lr-dtrecebido-bloco')) document.getElementById('lr-dtrecebido-bloco').style.display='none';
   document.getElementById('lr-tipo-pag').value='';
   document.getElementById('lr-banco').value='';
   document.getElementById('lr-juros').value='';
@@ -10328,6 +10449,27 @@ function setDfcFiltroRec(modo) {
   renderDfc();
 }
 
+// Item 5 — cache dos lançamentos que compõem cada célula do DFC Demonstrativo.
+let _dfcItensCache = null;
+
+// Drill-down do DFC: clique num valor abre os lançamentos, com editar/excluir.
+function abrirDetalheDfc(grupoId, mes) {
+  if (!_dfcItensCache) return;
+  const g = db.dre_grupos.find(x => x.id === grupoId);
+  const nomeGrupo = g ? g.nome : 'Conta';
+  let itens = [];
+  let periodoTxt = '';
+  const anoDfc = parseInt(document.getElementById('dfc-ano').value);
+  if (mes === 'total') {
+    for (let m = 1; m <= 12; m++) itens = itens.concat(_dfcItensCache[m][grupoId] || []);
+    periodoTxt = `Ano ${anoDfc}`;
+  } else {
+    itens = _dfcItensCache[mes][grupoId] || [];
+    periodoTxt = `${meses[mes]} / ${anoDfc}`;
+  }
+  abrirLancDrill(`${nomeGrupo} — ${periodoTxt}`, itens, renderDfc);
+}
+
 function renderDfc() {
   const ano = parseInt(document.getElementById('dfc-ano').value);
   const inclPagar   = document.getElementById('dfc-incluir-pagar').checked;
@@ -10354,9 +10496,12 @@ function renderDfc() {
 
   // Montar dados por mês (1-12) e por grupo
   const dados = {}; // dados[mes][grupoId] = valor
+  // Item 5 — itens que compõem cada célula (para o drill-down por clique)
+  const itensDfc = {}; // itensDfc[mes][grupoId] = [ {id,tipo,data,nome,prod,valor,status} ]
   for (let m = 1; m <= 12; m++) {
     dados[m] = {};
-    grupos.forEach(g => dados[m][g.id] = 0);
+    itensDfc[m] = {};
+    grupos.forEach(g => { dados[m][g.id] = 0; itensDfc[m][g.id] = []; });
   }
 
   // 1. Contas a Receber → Categoria do lançamento, senão do produto de venda, senão Receitas
@@ -10374,7 +10519,14 @@ function renderDfc() {
       const catProd = !catLanc && prodObj && prodObj.cat ? db.dfc_cats.find(x => x.id === prodObj.cat) : null;
       const catObj  = catLanc || catProd;
       const grupoId = catObj ? catObj.grupo : (grupoPadraoReceita && grupoPadraoReceita.id);
-      if (grupoId && dados[m][grupoId] !== undefined) dados[m][grupoId] += valParc;
+      if (grupoId && dados[m][grupoId] !== undefined) {
+        dados[m][grupoId] += valParc;
+        itensDfc[m][grupoId].push({
+          id: l.id, tipo: 'receber', data: dtRef, nome: getClienteNome(l.cliente),
+          prod: l.prod ? getProdVendaNome(l.prod) : '', valor: valParc,
+          status: l.recebido === 'sim' ? 'Recebido' : 'A Receber'
+        });
+      }
     });
   }
 
@@ -10395,12 +10547,19 @@ function renderDfc() {
         const parts = venc.split('-');
         if (parseInt(parts[0]) !== ano) continue;
         const m = parseInt(parts[1]);
-        if (grupoId && dados[m][grupoId] !== undefined) dados[m][grupoId] += valParc;
+        if (grupoId && dados[m][grupoId] !== undefined) {
+          dados[m][grupoId] += valParc;
+          itensDfc[m][grupoId].push({
+            id: l.id, tipo: 'pagar', data: venc, nome: getFornNome(l.forn),
+            prod: (l.prod ? getProdNome(l.prod) : '') + (n > 1 ? ` (${i}/${n})` : ''), valor: valParc,
+            status: l.pago === 'sim' ? 'Pago' : 'A Pagar'
+          });
+        }
       }
     });
   }
 
-  // 3. Lançamentos extras DFC
+  // 3. Lançamentos extras DFC (editados na tela DFC Lançamentos — não editáveis aqui)
   db.dfc_lans.forEach(l => {
     if (!l.data) return;
     const parts = l.data.split('-');
@@ -10411,8 +10570,15 @@ function renderDfc() {
     const key = catObj.grupo;
     if (dados[m][key] !== undefined) {
       dados[m][key] += (l.valor || 0);
+      itensDfc[m][key].push({
+        id: null, tipo: 'dfc', data: l.data, nome: (catObj.nome || 'Lançamento DFC'),
+        prod: l.obs || '', valor: (l.valor || 0), status: 'DFC'
+      });
     }
   });
+
+  // Guarda para o drill-down (abrirDetalheDfc)
+  _dfcItensCache = itensDfc;
 
   // Calcular resultado líquido por mês (Entradas − todas as Saídas)
   const liquido = {};
@@ -10435,14 +10601,18 @@ function renderDfc() {
   const mesesHeader = MESES_ABR.slice(1).map(m =>
     `<th>${m}</th>`).join('') + '<th class="dfc-col-total">Total</th>';
 
-  // Linha de um grupo
+  // Linha de um grupo (Item 5 — células clicáveis abrem o drill-down)
   const linha = (g) => {
     const cells = Array.from({length:12},(_,i)=>{
       const v = dados[i+1][g.id];
-      return `<td>${v>0?fmtDfcVal(v):'<span class="dfc-val-zero">—</span>'}</td>`;
+      if (v > 0) return `<td class="dre-cell-click" onclick="abrirDetalheDfc('${g.id}',${i+1})" title="Ver lançamentos">${fmtDfcVal(v)}</td>`;
+      return `<td><span class="dfc-val-zero">—</span></td>`;
     }).join('');
     const tot = totais[g.id];
-    return `<tr class="dfc-row-sub"><td>${g.nome}</td>${cells}<td class="dfc-col-total">${tot>0?fmtDfcVal(tot):'<span class="dfc-val-zero">—</span>'}</td></tr>`;
+    const totCell = tot > 0
+      ? `<td class="dfc-col-total dre-cell-click" onclick="abrirDetalheDfc('${g.id}','total')" title="Ver lançamentos">${fmtDfcVal(tot)}</td>`
+      : `<td class="dfc-col-total"><span class="dfc-val-zero">—</span></td>`;
+    return `<tr class="dfc-row-sub"><td>${g.nome}</td>${cells}${totCell}</tr>`;
   };
 
   // Linha de resultado
@@ -11078,6 +11248,11 @@ function toggleDreCategorias(grupoId, el) {
 function renderDre() {
   const ano = parseInt(document.getElementById('dre-ano').value);
   const somenteClassificados = document.getElementById('dre-somente-classificados').checked;
+  // Item 2 — base de data: 'competencia' (compra/venda) ou 'vencimento' (previsão).
+  const dreBaseEl = document.getElementById('dre-base');
+  const dreBase = dreBaseEl ? dreBaseEl.value : 'competencia';
+  // Item 3 — mostrar coluna de % ao lado de cada mês.
+  const mostrarPercentMes = !document.getElementById('dre-mostrar-percent') || document.getElementById('dre-mostrar-percent').checked;
   const wrap = document.getElementById('dre-tabela-wrap');
   if (!wrap) return;
 
@@ -11114,9 +11289,9 @@ function renderDre() {
   // "somente classificados" está desmarcado), para o DRE bater com o total vendido.
   const grupoBaseId = (gruposValor.find(g => g.tipo === 'entrada') || gruposValor[0] || {}).id;
 
-  // 1. Lançamentos a Receber (competência = data da venda)
+  // 1. Lançamentos a Receber (competência = data da venda; vencimento = previsão)
   db.lancreceber.forEach(l => {
-    const dtRef = l.dtvenda || l.dtcompra;
+    const dtRef = dreBase === 'vencimento' ? (l.dtprev || l.dtvenda || l.dtcompra) : (l.dtvenda || l.dtcompra);
     if (!dtRef) return;
     const parts = dtRef.split('-');
     if (parseInt(parts[0]) !== ano) return;
@@ -11131,16 +11306,16 @@ function renderDre() {
       valoresMes[m][grupoId] += (l.valor || 0);
       if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (l.valor || 0);
       itensMes[m][grupoId].push({
-        tipo: 'receber', data: dtRef, nome: getClienteNome(l.cliente),
+        id: l.id, tipo: 'receber', data: dtRef, nome: getClienteNome(l.cliente),
         prod: l.prod ? getProdVendaNome(l.prod) : '', valor: l.valor || 0,
         status: l.recebido === 'sim' ? 'Recebido' : 'A Receber', catId: catId || null
       });
     }
   });
 
-  // 2. Lançamentos a Pagar (competência = data da compra)
+  // 2. Lançamentos a Pagar (competência = data da compra; vencimento = previsão)
   db.lancamentos.forEach(l => {
-    const dtRef = l.dtcompra;
+    const dtRef = dreBase === 'vencimento' ? (l.dtprev || l.dtcompra) : l.dtcompra;
     if (!dtRef) return;
     const parts = dtRef.split('-');
     if (parseInt(parts[0]) !== ano) return;
@@ -11153,7 +11328,7 @@ function renderDre() {
       valoresMes[m][grupoId] += (l.valor || 0);
       if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (l.valor || 0);
       itensMes[m][grupoId].push({
-        tipo: 'pagar', data: dtRef, nome: getFornNome(l.forn),
+        id: l.id, tipo: 'pagar', data: dtRef, nome: getFornNome(l.forn),
         prod: l.prod ? getProdNome(l.prod) : '', valor: l.valor || 0,
         status: l.pago === 'sim' ? 'Pago' : 'A Pagar', catId: catId || null
       });
@@ -11232,7 +11407,20 @@ function renderDre() {
     });
   });
 
-  const mesesHeader = mesesVisiveis.map(m => `<th>${MESES_ABR[m]}</th>`).join('') + '<th class="dfc-col-total">DRE Acumulada</th>';
+  const mesesHeader = mesesVisiveis.map(m => `<th>${MESES_ABR[m]}</th>${mostrarPercentMes ? '<th class="dre-th-pct" title="% sobre a Receita Bruta">%</th>' : ''}`).join('') + '<th class="dfc-col-total">DRE Acumulada</th>';
+
+  // Item 3 — célula de % (valor da conta ÷ Receita Bruta do mês). Cada linha
+  // de valor acrescenta uma célula de % ao lado de cada mês; linhas que não
+  // têm % (percentual, variação de estoque, ponto de equilíbrio) acrescentam
+  // uma célula vazia só para manter o alinhamento das colunas.
+  const receitaBrutaMes = (mes) => (grupoBaseId ? (valoresMes[mes][grupoBaseId] || 0) : 0);
+  const pctCell = (v, mes) => {
+    if (!mostrarPercentMes) return '';
+    const base = receitaBrutaMes(mes);
+    const pct = base ? (v / base) * 100 : 0;
+    return `<td class="dre-pct-cell">${fmtDrePercent(pct)}</td>`;
+  };
+  const pctVazia = () => mostrarPercentMes ? '<td class="dre-pct-cell"></td>' : '';
 
   // Soma bruta de uma CATEGORIA (não do grupo inteiro) — usada nas linhas de
   // detalhamento por categoria dentro de cada grupo do DRE.
@@ -11244,10 +11432,10 @@ function renderDre() {
   const linhaValor = (g, cls, clicavel) => {
     const cells = mesesVisiveis.map(mes => {
       const v = linhaCalc[g.id][mes];
-      if (clicavel && Math.abs(v) >= 0.005) {
-        return `<td class="dre-cell-click" onclick="abrirDetalheDreGrupo('${g.id}',${mes})" title="Ver lançamentos desta conta">${fmtDreVal(v)}</td>`;
-      }
-      return `<td>${fmtDreVal(v)}</td>`;
+      const cell = (clicavel && Math.abs(v) >= 0.005)
+        ? `<td class="dre-cell-click" onclick="abrirDetalheDreGrupo('${g.id}',${mes})" title="Ver lançamentos desta conta">${fmtDreVal(v)}</td>`
+        : `<td>${fmtDreVal(v)}</td>`;
+      return cell + pctCell(v, mes);
     }).join('');
     const totalVal = linhaCalc[g.id]['total'];
     const totalCell = (clicavel && Math.abs(totalVal) >= 0.005)
@@ -11266,10 +11454,10 @@ function renderDre() {
     const sinal = parentG.tipo === 'entrada' ? 1 : -1;
     const cells = mesesVisiveis.map(mes => {
       const v = sinal * catBruto(c.id, mes);
-      if (Math.abs(v) >= 0.005) {
-        return `<td class="dre-cell-click" onclick="abrirDetalheDreGrupo('${parentG.id}',${mes},'${c.id}')" title="Ver lançamentos desta categoria">${fmtDreVal(v)}</td>`;
-      }
-      return `<td>${fmtDreVal(v)}</td>`;
+      const cell = (Math.abs(v) >= 0.005)
+        ? `<td class="dre-cell-click" onclick="abrirDetalheDreGrupo('${parentG.id}',${mes},'${c.id}')" title="Ver lançamentos desta categoria">${fmtDreVal(v)}</td>`
+        : `<td>${fmtDreVal(v)}</td>`;
+      return cell + pctCell(v, mes);
     }).join('');
     const totalVal = sinal * catBruto(c.id, 'total');
     const totalCell = Math.abs(totalVal) >= 0.005
@@ -11289,10 +11477,10 @@ function renderDre() {
     if (!temResto) return '';
     const cells = mesesVisiveis.map(mes => {
       const v = sinal * restoCol(mes);
-      if (Math.abs(v) >= 0.005) {
-        return `<td class="dre-cell-click" onclick="abrirDetalheDreGrupo('${parentG.id}',${mes},'__sem_categoria__')" title="Ver lançamentos sem categoria">${fmtDreVal(v)}</td>`;
-      }
-      return `<td>${fmtDreVal(v)}</td>`;
+      const cell = (Math.abs(v) >= 0.005)
+        ? `<td class="dre-cell-click" onclick="abrirDetalheDreGrupo('${parentG.id}',${mes},'__sem_categoria__')" title="Ver lançamentos sem categoria">${fmtDreVal(v)}</td>`
+        : `<td>${fmtDreVal(v)}</td>`;
+      return cell + pctCell(v, mes);
     }).join('');
     const totalVal = sinal * restoCol('total');
     const totalCell = Math.abs(totalVal) >= 0.005
@@ -11301,7 +11489,7 @@ function renderDre() {
     return `<tr class="dre-row-cat" data-cat-grupo="${parentG.id}"><td style="padding-left:26px;font-weight:400;font-style:italic;color:#a8a29e;font-size:10.5px;">↳ (Sem categoria)</td>${cells}${totalCell}</tr>`;
   };
   const linhaPercentual = (g) => {
-    const cells = mesesVisiveis.map(mes => `<td>${fmtDrePercent(linhaCalc[g.id][mes])}</td>`).join('');
+    const cells = mesesVisiveis.map(mes => `<td>${fmtDrePercent(linhaCalc[g.id][mes])}</td>${pctVazia()}`).join('');
     return `<tr class="dre-row-percent"><td>${g.nome}</td>${cells}<td class="dfc-col-total">${fmtDrePercent(linhaCalc[g.id]['total'])}</td></tr>`;
   };
 
@@ -11310,7 +11498,7 @@ function renderDre() {
   const ultimoSubtotalId = subtotais.length ? subtotais[subtotais.length - 1].id : null;
 
   const linhaFinal = (g, cls) => {
-    const cells = mesesVisiveis.map(mes => `<td>${fmtDreVal(linhaCalc[g.id][mes])}</td>`).join('');
+    const cells = mesesVisiveis.map(mes => { const v = linhaCalc[g.id][mes]; return `<td>${fmtDreVal(v)}</td>${pctCell(v, mes)}`; }).join('');
     const totalVal = linhaCalc[g.id]['total'];
     return `<tr class="${cls}"><td>${g.nome}</td>${cells}<td class="dfc-col-total">${fmtDreVal(totalVal)}</td></tr>`;
   };
@@ -11323,7 +11511,7 @@ function renderDre() {
       const val = parseFloat(mapaAno[mes]) || 0;
       const disp = fmtContabil(val);
       const cor = val < 0 ? '#dc2626' : '#1f2937';
-      return `<td style="padding:2px 4px"><input type="text" inputmode="decimal" value="${disp}" onchange="setVarEstoque(${mes}, this.value)" onfocus="this.select()" title="Variação de estoque do mês (+ soma ao CPV, − reduz o CPV)" placeholder="0,00" style="width:100%;min-width:88px;text-align:right;font-family:'DM Mono',monospace;font-size:12px;padding:5px 7px;border:1px solid #e7e5e4;border-radius:6px;background:#fff;color:${cor}" /></td>`;
+      return `<td style="padding:2px 4px"><input type="text" inputmode="decimal" value="${disp}" onchange="setVarEstoque(${mes}, this.value)" onfocus="this.select()" title="Variação de estoque do mês (+ soma ao CPV, − reduz o CPV)" placeholder="0,00" style="width:100%;min-width:88px;text-align:right;font-family:'DM Mono',monospace;font-size:12px;padding:5px 7px;border:1px solid #e7e5e4;border-radius:6px;background:#fff;color:${cor}" /></td>${pctVazia()}`;
     }).join('');
     let soma = 0; mesesVisiveis.forEach(mes => { soma += parseFloat(mapaAno[mes]) || 0; });
     const totalCell = `<td class="dfc-col-total">${Math.abs(soma) < 0.005 ? '<span class="dfc-val-zero">—</span>' : (soma > 0 ? '+ ' : '− ') + fmtBRL(Math.abs(soma))}</td>`;
@@ -11372,7 +11560,7 @@ function renderDre() {
   };
   const peCells = mesesVisiveis.map(m => {
     const v = peCol(m);
-    return `<td>${v==null ? '<span class="dfc-val-zero">—</span>' : fmtBRL(v)}</td>`;
+    return `<td>${v==null ? '<span class="dfc-val-zero">—</span>' : fmtBRL(v)}</td>${pctVazia()}`;
   }).join('');
   const peTot = peCol('total');
   const peRow = `<tr class="dre-row-pe"><td>Ponto de Equilíbrio (R$)</td>${peCells}<td class="dfc-col-total">${peTot==null ? '<span class="dfc-val-zero">—</span>' : fmtBRL(peTot)}</td></tr>`;
@@ -11699,6 +11887,85 @@ function fmtDrePercent(v) {
   return `<span class="${cls}">${v.toFixed(2)}%</span>`;
 }
 
+// ══════════════════════════════════════════════════════════════════
+// DRILL-DOWN REUTILIZÁVEL DE LANÇAMENTOS (itens 4, 5 e 6)
+// Recebe uma lista de itens { id, tipo:'pagar'|'receber', data, nome,
+// prod, valor, status } e monta um modal com editar/excluir por linha.
+// `refreshFn` é chamada após excluir para reatualizar a tela de origem.
+// ══════════════════════════════════════════════════════════════════
+let _lancDrillRefresh = null;
+
+function abrirLancDrill(titulo, itens, refreshFn) {
+  _lancDrillRefresh = (typeof refreshFn === 'function') ? refreshFn : null;
+  itens = [...(itens || [])].sort((a, b) => (a.data || '').localeCompare(b.data || ''));
+
+  const titleEl = document.getElementById('lanc-drill-title');
+  if (titleEl) titleEl.textContent = titulo || 'Lançamentos';
+
+  const total = itens.reduce((s, it) => s + (it.valor || 0), 0);
+  const confirmado = itens.filter(it => it.status === 'Recebido' || it.status === 'Pago').reduce((s, it) => s + (it.valor || 0), 0);
+  const pendente = total - confirmado;
+
+  const kpisEl = document.getElementById('lanc-drill-kpis');
+  if (kpisEl) {
+    kpisEl.innerHTML = `
+      <div class="card kpi"><div class="kpi-val">${itens.length}</div><div class="kpi-lbl">Lançamentos</div></div>
+      <div class="card kpi"><div class="kpi-val">${fmtBRL(total)}</div><div class="kpi-lbl">Total do período</div></div>
+      <div class="card kpi"><div class="kpi-val" style="color:#166534">${fmtBRL(confirmado)}</div><div class="kpi-lbl">Já confirmado</div></div>
+      <div class="card kpi"><div class="kpi-val" style="color:#d97706">${fmtBRL(pendente)}</div><div class="kpi-lbl">Ainda pendente</div></div>`;
+  }
+
+  const tbody = document.getElementById('lanc-drill-tbody');
+  if (tbody) {
+    tbody.innerHTML = itens.length
+      ? itens.map(it => {
+          let badge;
+          if (it.status === 'Recebido' || it.status === 'Pago') badge = `<span class="badge badge-green">${it.status}</span>`;
+          else if (it.status === 'A Receber') badge = `<span class="badge" style="background:#dbeafe;color:#1e6fad;font-weight:600">${it.status}</span>`;
+          else badge = `<span class="badge badge-red">${it.status}</span>`;
+          const acoes = it.id
+            ? `<button class="btn btn-secondary btn-sm" onclick="drillEditar('${it.tipo}','${it.id}')">Editar</button>
+               <button class="btn btn-danger btn-sm" onclick="drillExcluir('${it.tipo}','${it.id}', this)">Excluir</button>`
+            : '<span class="dfc-val-zero">—</span>';
+          return `<tr>
+            <td>${fmtDate(it.data)}</td>
+            <td>${it.nome || '—'}</td>
+            <td>${it.prod || '—'}</td>
+            <td>${badge}</td>
+            <td style="font-family:DM Mono,monospace;text-align:right">${fmtBRL(it.valor)}</td>
+            <td style="text-align:center;white-space:nowrap">${acoes}</td>
+          </tr>`;
+        }).join('')
+      : '<tr><td colspan="6" class="empty-state">Nenhum lançamento encontrado.</td></tr>';
+  }
+
+  openModal('modal-lanc-drill');
+}
+
+// Editar a partir do drill-down: fecha o drill e abre a tela de edição.
+function drillEditar(tipo, id) {
+  closeModal('modal-lanc-drill');
+  if (tipo === 'receber') editLancReceber(id);
+  else editLancamento(id);
+}
+
+// Excluir a partir do drill-down: confirma, remove no banco e na memória,
+// tira a linha do modal e reatualiza a tela de origem.
+async function drillExcluir(tipo, id, btn) {
+  if (!confirm('Excluir este lançamento?')) return;
+  if (tipo === 'receber') {
+    await sbFetch('lancreceber', 'DELETE', null, `?id=eq.${id}`);
+    db.lancreceber = db.lancreceber.filter(x => x.id !== id);
+    renderAReceber(); renderRecebido(); renderLancReceber();
+  } else {
+    await sbFetch('lancamentos', 'DELETE', null, `?id=eq.${id}`);
+    db.lancamentos = db.lancamentos.filter(x => x.id !== id);
+    renderApagar(); renderPagas(); renderLancamentos();
+  }
+  const tr = btn.closest('tr'); if (tr) tr.remove();
+  if (typeof _lancDrillRefresh === 'function') { try { _lancDrillRefresh(); } catch(e){} }
+}
+
 // Drill-down: clique em um valor do DRE abre o detalhe dos lançamentos
 // que compõem aquele número (mes = 1..12 ou 'total' para o ano inteiro).
 function abrirDetalheDreGrupo(grupoId, mes, catId) {
@@ -11722,46 +11989,9 @@ function abrirDetalheDreGrupo(grupoId, mes, catId) {
   if (catId) {
     itens = itens.filter(it => catId === '__sem_categoria__' ? !it.catId : it.catId === catId);
   }
-  itens = [...itens].sort((a, b) => (a.data || '').localeCompare(b.data || ''));
 
-  const titleEl = document.getElementById('dre-detalhe-title');
-  if (titleEl) titleEl.textContent = `${nomeGrupo} — ${periodoTxt}`;
-
-  const total = itens.reduce((s, it) => s + it.valor, 0);
-  const totalConfirmado = itens.filter(it => it.status === 'Recebido' || it.status === 'Pago').reduce((s, it) => s + it.valor, 0);
-  const totalPendente = total - totalConfirmado;
-
-  const kpisEl = document.getElementById('dre-detalhe-kpis');
-  if (kpisEl) {
-    kpisEl.innerHTML = `
-      <div class="card kpi"><div class="kpi-val">${itens.length}</div><div class="kpi-lbl">Lançamentos</div></div>
-      <div class="card kpi"><div class="kpi-val">${fmtBRL(total)}</div><div class="kpi-lbl">Total do período</div></div>
-      <div class="card kpi"><div class="kpi-val" style="color:#166534">${fmtBRL(totalConfirmado)}</div><div class="kpi-lbl">Já confirmado</div></div>
-      <div class="card kpi"><div class="kpi-val" style="color:#d97706">${fmtBRL(totalPendente)}</div><div class="kpi-lbl">Ainda pendente</div></div>`;
-  }
-
-  const tbody = document.getElementById('dre-detalhe-tbody');
-  if (tbody) {
-    if (!itens.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum lançamento encontrado.</td></tr>';
-    } else {
-      tbody.innerHTML = itens.map(it => {
-        let badge;
-        if (it.status === 'Recebido' || it.status === 'Pago') badge = `<span class="badge badge-green">${it.status}</span>`;
-        else if (it.status === 'A Receber') badge = `<span class="badge" style="background:#dbeafe;color:#1e6fad;font-weight:600">${it.status}</span>`;
-        else badge = `<span class="badge badge-red">${it.status}</span>`;
-        return `<tr>
-          <td>${fmtDate(it.data)}</td>
-          <td>${it.nome || '—'}</td>
-          <td>${it.prod || '—'}</td>
-          <td>${badge}</td>
-          <td style="font-family:DM Mono,monospace;text-align:right">${fmtBRL(it.valor)}</td>
-        </tr>`;
-      }).join('');
-    }
-  }
-
-  openModal('modal-dre-detalhe');
+  // Item 4 — abre o drill-down com editar/excluir; ao excluir, reatualiza o DRE.
+  abrirLancDrill(`${nomeGrupo} — ${periodoTxt}`, itens, renderDre);
 }
 
 function renderDreChart(grupos, gruposValor, linhaCalc, ultimoSubtotalId) {
@@ -12318,8 +12548,223 @@ function calcJuros(valParc, venc, taxaMes) {
 
 
 // ══════════════════════════════════════════════════════════
+// FLUXO DE CAIXA DIÁRIO (item 1) — receita, despesa e resultado por dia do
+// mês, com base Realizado (por data de pagamento/recebimento) ou Previsto
+// (por vencimento). Os valores são clicáveis e abrem os lançamentos que os
+// compõem, com opção de editar/excluir.
+// ══════════════════════════════════════════════════════════
+let _fdItensCache = null;
+
+// Preenche os selects de Ano e Conta preservando a seleção atual.
+function fdPopularSelects() {
+  const anoEl = document.getElementById('fd-ano');
+  const bancoEl = document.getElementById('fd-banco');
+  if (anoEl) {
+    const anos = new Set();
+    db.lancamentos.forEach(l => { if (l.dtcompra) anos.add(parseInt(l.dtcompra.split('-')[0])); if (l.dtpago) anos.add(parseInt(l.dtpago.split('-')[0])); });
+    db.lancreceber.forEach(l => { if (l.dtvenda) anos.add(parseInt(l.dtvenda.split('-')[0])); if (l.dtrecebido) anos.add(parseInt(l.dtrecebido.split('-')[0])); });
+    anos.add(new Date().getFullYear());
+    if (anoEl.value) anos.add(parseInt(anoEl.value));
+    const atual = anoEl.value || String(new Date().getFullYear());
+    anoEl.innerHTML = [...anos].filter(a=>a).sort((a,b)=>b-a).map(a => `<option value="${a}">${a}</option>`).join('');
+    anoEl.value = atual;
+  }
+  if (bancoEl) {
+    const sel = bancoEl.value;
+    bancoEl.innerHTML = '<option value="">Todas as Contas</option>' + db.bancos.map(b => `<option value="${b.id}">${b.nome}</option>`).join('');
+    bancoEl.value = sel;
+  }
+}
+
+function fdMudarMes(delta) {
+  const anoEl = document.getElementById('fd-ano'), mesEl = document.getElementById('fd-mes');
+  if (!anoEl || !mesEl) return;
+  let ano = parseInt(anoEl.value) || new Date().getFullYear();
+  let mes = (parseInt(mesEl.value) || (new Date().getMonth()+1)) + delta;
+  if (mes < 1) { mes = 12; ano--; }
+  if (mes > 12) { mes = 1; ano++; }
+  if (![...anoEl.options].some(o => parseInt(o.value) === ano)) {
+    anoEl.insertAdjacentHTML('beforeend', `<option value="${ano}">${ano}</option>`);
+  }
+  anoEl.value = ano; mesEl.value = String(mes);
+  renderFluxoDiario();
+}
+
+function fdMesAtual() {
+  const h = new Date();
+  const anoEl = document.getElementById('fd-ano'), mesEl = document.getElementById('fd-mes');
+  if (anoEl) { if (![...anoEl.options].some(o => parseInt(o.value) === h.getFullYear())) anoEl.insertAdjacentHTML('beforeend', `<option value="${h.getFullYear()}">${h.getFullYear()}</option>`); anoEl.value = h.getFullYear(); }
+  if (mesEl) mesEl.value = String(h.getMonth()+1);
+  renderFluxoDiario();
+}
+
+function renderFluxoDiario() {
+  const wrap = document.getElementById('fluxo-diario-wrap');
+  if (!wrap) return;
+  const anoEl = document.getElementById('fd-ano'), mesEl = document.getElementById('fd-mes');
+  if (!anoEl || !mesEl) return;
+  const h = new Date();
+  if (!anoEl.value) { fdPopularSelects(); anoEl.value = h.getFullYear(); mesEl.value = String(h.getMonth()+1); }
+  else fdPopularSelects();
+
+  const ano = parseInt(anoEl.value) || h.getFullYear();
+  const mes = parseInt(mesEl.value) || (h.getMonth()+1);
+  const base = document.getElementById('fd-base') ? document.getElementById('fd-base').value : 'realizado';
+  const bancoSel = document.getElementById('fd-banco') ? document.getElementById('fd-banco').value : '';
+  const contaOk = (b) => !bancoSel || b === bancoSel;
+
+  const diasNoMes = new Date(ano, mes, 0).getDate();
+  const porDia = {}, itensDia = {};
+  for (let d = 1; d <= 31; d++) { porDia[d] = { receita: 0, despesa: 0 }; itensDia[d] = { receita: [], despesa: [] }; }
+  const add = (d, col, item) => { if (!porDia[d]) return; porDia[d][col] += item.valor; itensDia[d][col].push(item); };
+  const rotuloParc = (p) => p.totalParc > 1 ? ` (${p.parcIdx}/${p.totalParc})` : '';
+
+  if (base === 'realizado') {
+    getParcelas(true).forEach(p => {
+      if (!p.dtpago || !contaOk(p.banco)) return;
+      const [y,m,dd] = p.dtpago.split('-').map(Number);
+      if (y !== ano || m !== mes) return;
+      add(dd, 'despesa', { id:p.lancId, tipo:'pagar', data:p.dtpago, nome:getFornNome(p.forn), prod:(p.prod?getProdNome(p.prod):'')+rotuloParc(p), valor:p.valParc, status:'Pago' });
+    });
+    getParcelasReceber(true).forEach(p => {
+      if (!p.dtrecebido || !contaOk(p.banco)) return;
+      const [y,m,dd] = p.dtrecebido.split('-').map(Number);
+      if (y !== ano || m !== mes) return;
+      add(dd, 'receita', { id:p.lancId, tipo:'receber', data:p.dtrecebido, nome:getClienteNome(p.cliente), prod:(p.prod?getProdVendaNome(p.prod):'')+rotuloParc(p), valor:p.valParc, status:'Recebido' });
+    });
+  } else {
+    getParcelas(true).concat(getParcelas(false)).forEach(p => {
+      const venc = p.venc || p.dtcompra;
+      if (!venc || !contaOk(p.banco)) return;
+      const [y,m,dd] = venc.split('-').map(Number);
+      if (y !== ano || m !== mes) return;
+      add(dd, 'despesa', { id:p.lancId, tipo:'pagar', data:venc, nome:getFornNome(p.forn), prod:(p.prod?getProdNome(p.prod):'')+rotuloParc(p), valor:p.valParc, status:p.isPago?'Pago':'A Pagar' });
+    });
+    getParcelasReceber(true).concat(getParcelasReceber(false)).forEach(p => {
+      const venc = p.venc || p.dtvenda;
+      if (!venc || !contaOk(p.banco)) return;
+      const [y,m,dd] = venc.split('-').map(Number);
+      if (y !== ano || m !== mes) return;
+      add(dd, 'receita', { id:p.lancId, tipo:'receber', data:venc, nome:getClienteNome(p.cliente), prod:(p.prod?getProdVendaNome(p.prod):'')+rotuloParc(p), valor:p.valParc, status:p.isRecebido?'Recebido':'A Receber' });
+    });
+  }
+  _fdItensCache = itensDia;
+
+  // Totais e análise do mês
+  let totReceita = 0, totDespesa = 0, diasComMov = 0;
+  let melhorDia = null, melhorVal = -Infinity, piorDia = null, piorVal = Infinity;
+  for (let d = 1; d <= diasNoMes; d++) {
+    const { receita, despesa } = porDia[d];
+    totReceita += receita; totDespesa += despesa;
+    const temMov = receita > 0.005 || despesa > 0.005;
+    if (temMov) diasComMov++;
+    const res = receita - despesa;
+    if (temMov && res > melhorVal) { melhorVal = res; melhorDia = d; }
+    if (temMov && res < piorVal) { piorVal = res; piorDia = d; }
+  }
+  const resultado = totReceita - totDespesa;
+  const nomeMes = meses[mes] || '';
+
+  const analiseHtml = diasComMov
+    ? `<div class="card" style="padding:12px 18px;margin-bottom:16px;font-size:13px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:11px;color:#a8a29e;font-weight:600;text-transform:uppercase;letter-spacing:.6px">Análise do Resultado</span>
+        <span><b style="color:#166534">Melhor dia de ${nomeMes}:</b> dia ${melhorDia} (${fmtDreVal(melhorVal)})</span>
+        <span><b style="color:#dc2626">Pior dia:</b> dia ${piorDia} (${fmtDreVal(piorVal)})</span>
+      </div>`
+    : '';
+
+  // Célula de resultado do dia (verde/vermelha), clicável
+  const celResultado = (d, receita, despesa) => {
+    const temMov = receita > 0.005 || despesa > 0.005;
+    if (!temMov) return '<td style="text-align:right"><span class="dfc-val-zero">—</span></td>';
+    const res = receita - despesa;
+    const cor = res >= 0 ? '#16a34a' : '#dc2626';
+    const txt = res < 0 ? `(${fmtBRL(Math.abs(res))})` : fmtBRL(res);
+    return `<td style="padding:3px 6px"><div class="dre-cell-click" onclick="abrirDetalheFluxoDiario(${d},'resultado')" title="Ver lançamentos do dia" style="background:${cor};color:#fff;font-weight:700;border-radius:5px;padding:4px 8px;text-align:right;font-family:'DM Mono',monospace">${txt}</div></td>`;
+  };
+  const celValor = (d, col, valor, cls, sinal) => {
+    if (valor <= 0.005) return '<td style="text-align:right"><span class="dfc-val-zero">—</span></td>';
+    return `<td class="dre-cell-click" style="text-align:right" onclick="abrirDetalheFluxoDiario(${d},'${col}')" title="Ver lançamentos"><span class="${cls}">${sinal}${fmtBRL(valor)}</span></td>`;
+  };
+
+  const linhaDia = (d) => {
+    if (d > diasNoMes) return `<tr style="opacity:.4"><td style="font-weight:700">${d}</td><td colspan="3" style="text-align:center"><span class="dfc-val-zero">—</span></td></tr>`;
+    const { receita, despesa } = porDia[d];
+    const isHoje = ano === h.getFullYear() && mes === (h.getMonth()+1) && d === h.getDate();
+    return `<tr${isHoje ? ' class="fb-dia-hoje"' : ''}>
+      <td style="font-weight:700;white-space:nowrap">${String(d).padStart(2,'0')}${isHoje ? ' <span style="font-size:9px;color:#ea580c">HOJE</span>' : ''}</td>
+      ${celValor(d,'receita',receita,'dfc-val-pos','')}
+      ${celValor(d,'despesa',despesa,'dfc-val-neg','')}
+      ${celResultado(d,receita,despesa)}
+    </tr>`;
+  };
+
+  const cabecalho = `<thead><tr><th style="text-align:left">DIA</th><th style="text-align:right">RECEITA</th><th style="text-align:right">DESPESA</th><th style="text-align:right">RESULTADO DO DIA</th></tr></thead>`;
+  const tabela = (ini, fim, comTotal) => {
+    let linhas = '';
+    for (let d = ini; d <= fim; d++) linhas += linhaDia(d);
+    let totalRow = '';
+    if (comTotal) {
+      totalRow = `<tr class="dfc-row-total-rl"><td>Total</td>
+        <td style="text-align:right"><span class="dfc-val-pos">${fmtBRL(totReceita)}</span></td>
+        <td style="text-align:right"><span class="dfc-val-neg">${fmtBRL(totDespesa)}</span></td>
+        <td style="text-align:right">${fmtDreVal(resultado)}</td></tr>`;
+    }
+    return `<table class="dfc-table" style="width:100%">${cabecalho}<tbody>${linhas}${totalRow}</tbody></table>`;
+  };
+
+  const resCor = resultado >= 0 ? '#166534' : '#dc2626';
+  wrap.innerHTML = `
+    <div class="grid4" style="margin-bottom:16px;">
+      <div class="card kpi"><div class="kpi-val" style="color:#166534">${fmtBRL(totReceita)}</div><div class="kpi-lbl">Receita do mês</div></div>
+      <div class="card kpi"><div class="kpi-val" style="color:#dc2626">${fmtBRL(totDespesa)}</div><div class="kpi-lbl">Despesa do mês</div></div>
+      <div class="card kpi"><div class="kpi-val" style="color:${resCor}">${fmtDreVal(resultado)}</div><div class="kpi-lbl">Resultado do mês</div></div>
+      <div class="card kpi"><div class="kpi-val">${diasComMov} <span style="font-size:13px;color:#a8a29e">/ ${diasNoMes}</span></div><div class="kpi-lbl">Dias com movimento</div></div>
+    </div>
+    ${analiseHtml}
+    <div class="card" style="overflow-x:auto">
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;align-items:start;min-width:840px">
+        <div>${tabela(1,10,false)}</div>
+        <div>${tabela(11,20,false)}</div>
+        <div>${tabela(21,31,true)}</div>
+      </div>
+    </div>`;
+}
+
+// Drill-down do Fluxo Diário: abre os lançamentos de um dia (receita, despesa
+// ou o resultado = receita + despesa), com editar/excluir.
+function abrirDetalheFluxoDiario(dia, tipo) {
+  if (!_fdItensCache || !_fdItensCache[dia]) return;
+  const ano = parseInt((document.getElementById('fd-ano')||{}).value) || new Date().getFullYear();
+  const mes = parseInt((document.getElementById('fd-mes')||{}).value) || (new Date().getMonth()+1);
+  const dataStr = `${ano}-${String(mes).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+  let itens, titulo;
+  if (tipo === 'resultado') {
+    itens = [...(_fdItensCache[dia].receita||[]), ...(_fdItensCache[dia].despesa||[])];
+    titulo = `Resultado do dia — ${fmtDate(dataStr)}`;
+  } else {
+    itens = _fdItensCache[dia][tipo] || [];
+    titulo = (tipo === 'receita' ? 'Receita' : 'Despesa') + ` — ${fmtDate(dataStr)}`;
+  }
+  abrirLancDrill(titulo, itens, renderFluxoDiario);
+}
+
+
+// ══════════════════════════════════════════════════════════
 // FLUXO DE CAIXA FUTURO (projeção por vencimento, com saldo opcional)
 // ══════════════════════════════════════════════════════════
+// Item 6 — cache dos lançamentos por dia do Fluxo de Caixa Futuro.
+let _ffItensCache = null;
+
+// Drill-down do Fluxo Futuro: clique num valor abre os lançamentos daquele
+// dia (a receber ou a pagar), com editar/excluir.
+function abrirDetalheFuturo(dataStr, tipo) {
+  if (!_ffItensCache || !_ffItensCache[dataStr]) return;
+  const itens = _ffItensCache[dataStr][tipo] || [];
+  const titulo = (tipo === 'receber' ? 'A Receber' : 'A Pagar') + ' — ' + fmtDate(dataStr);
+  abrirLancDrill(titulo, itens, renderFluxoFuturo);
+}
+
 function renderFluxoFuturo() {
   const wrap = document.getElementById('fluxo-futuro-wrap');
   if (!wrap) return;
@@ -12342,16 +12787,33 @@ function renderFluxoFuturo() {
 
   // Agrupa por dia de VENCIMENTO apenas o que ainda está pendente
   const porDia = {};
-  datas.forEach(d => porDia[d] = { receber: 0, pagar: 0 });
+  // Item 6 — itens que compõem cada dia (para o drill-down por clique)
+  const porDiaItens = {};
+  datas.forEach(d => { porDia[d] = { receber: 0, pagar: 0 }; porDiaItens[d] = { receber: [], pagar: [] }; });
 
   getParcelas(false).forEach(p => {
     const d = p.venc || p.dtcompra;
-    if (d && datasSet.has(d)) porDia[d].pagar += (p.valParc || 0);
+    if (d && datasSet.has(d)) {
+      porDia[d].pagar += (p.valParc || 0);
+      porDiaItens[d].pagar.push({
+        id: p.lancId, tipo: 'pagar', data: d, nome: getFornNome(p.forn),
+        prod: (p.prod ? getProdNome(p.prod) : '') + (p.totalParc > 1 ? ` (${p.parcIdx}/${p.totalParc})` : ''),
+        valor: (p.valParc || 0), status: 'A Pagar'
+      });
+    }
   });
   getParcelasReceber(false).forEach(p => {
     const d = p.venc || p.dtvenda;
-    if (d && datasSet.has(d)) porDia[d].receber += (p.valParc || 0);
+    if (d && datasSet.has(d)) {
+      porDia[d].receber += (p.valParc || 0);
+      porDiaItens[d].receber.push({
+        id: p.lancId, tipo: 'receber', data: d, nome: getClienteNome(p.cliente),
+        prod: (p.prod ? getProdVendaNome(p.prod) : '') + (p.totalParc > 1 ? ` (${p.parcIdx}/${p.totalParc})` : ''),
+        valor: (p.valParc || 0), status: 'A Receber'
+      });
+    }
   });
+  _ffItensCache = porDiaItens;
 
   const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   let saldoAcum = saldoBase;
@@ -12373,8 +12835,8 @@ function renderFluxoFuturo() {
     return `<tr class="${rowCls}">
       <td style="font-weight:700;white-space:nowrap">${fmtDate(d)}${isHoje ? ' <span style="font-size:9px;color:#ea580c">HOJE</span>' : ''}</td>
       <td>${diasSemana[dt.getDay()]}</td>
-      <td>${receber > 0.005 ? `<span class="dfc-val-pos">+ ${fmtBRL(receber)}</span>` : '<span class="dfc-val-zero">—</span>'}</td>
-      <td>${pagar > 0.005 ? `<span class="dfc-val-neg">− ${fmtBRL(pagar)}</span>` : '<span class="dfc-val-zero">—</span>'}</td>
+      <td>${receber > 0.005 ? `<span class="dre-cell-click" onclick="abrirDetalheFuturo('${d}','receber')" title="Ver lançamentos"><span class="dfc-val-pos">+ ${fmtBRL(receber)}</span></span>` : '<span class="dfc-val-zero">—</span>'}</td>
+      <td>${pagar > 0.005 ? `<span class="dre-cell-click" onclick="abrirDetalheFuturo('${d}','pagar')" title="Ver lançamentos"><span class="dfc-val-neg">− ${fmtBRL(pagar)}</span></span>` : '<span class="dfc-val-zero">—</span>'}</td>
       <td>${Math.abs(receber - pagar) > 0.005 ? fmtDreVal(receber - pagar) : '<span class="dfc-val-zero">—</span>'}</td>
       <td class="${saldoCls}" style="font-weight:700">${fmtBRL(saldoAcum)}${isRisco ? ' ⚠️' : ''}</td>
     </tr>`;
@@ -14310,10 +14772,8 @@ function imprimirReposicoes() { imprimirPagina('reposicao'); }
 window.APP_BUILD = '2026-08-10 · planeta-flores-empresa-unica';
 (function(){ var b = document.getElementById('sidebar-build'); if (b) b.textContent = 'build ' + window.APP_BUILD; })();
 
-// Fechar modais clicando fora
-document.querySelectorAll('.modal-overlay').forEach(ov => {
-  ov.addEventListener('click', e => { if(e.target === ov) ov.classList.remove('open'); });
-});
+// Item 9 — Fechar telas SOMENTE pelo botão de fechar/cancelar.
+// (Removido o fechamento ao clicar fora do modal, a pedido do usuário.)
 
 // ══════════════════════════════════════════
 // Item 6 — Botão flutuante de novo lançamento (a pagar / a receber)
