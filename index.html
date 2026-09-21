@@ -105,7 +105,6 @@ body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:v
 .sidebar { transition:transform .18s ease; }
 body.menu-oculto .sidebar { transform:translateX(-228px); box-shadow:none; }
 body.menu-oculto .main { margin-left:0; }
-body.menu-oculto .sidebar:hover,
 body.menu-oculto.menu-espiando .sidebar { transform:translateX(0); box-shadow:4px 0 24px rgba(15,30,58,0.28); }
 /* Faixa invisível na borda esquerda que "chama" o menu de volta */
 .menu-hotzone { display:none; position:fixed; left:0; top:0; bottom:0; width:10px; z-index:99; }
@@ -734,13 +733,13 @@ th.ef-th { padding:8px 8px 8px 12px; }
         </div>
         <div class="nav-sub-item" onclick="showPage('transferencias')" id="nav-transferencias">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-          Transferência entre Contas
+          Transf. Ent. Contas
         </div>
         <div class="nav-sub-item" onclick="showPage('fornecedores')" id="nav-fornecedores">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           Despesas/Fornecedor
         </div>
-        <div class="nav-sub-item" onclick="showPage('produtos')" id="nav-produtos">
+        <div class="nav-sub-item" onclick="showPage('produtos')" id="nav-produtos" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
           Item (Compra)
         </div>
@@ -768,13 +767,13 @@ th.ef-th { padding:8px 8px 8px 12px; }
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Clientes
         </div>
-        <div class="nav-sub-item" onclick="showPage('prodvenda')" id="nav-prodvenda">
+        <div class="nav-sub-item" onclick="showPage('prodvenda')" id="nav-prodvenda" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           Produtos de Venda
         </div>
         <div class="nav-sub-item" onclick="showPage('lancreceber')" id="nav-lancreceber">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
-          Lançamentos a Receber
+          Lanç. à Receber
         </div>
         <div class="nav-sub-item" onclick="showPage('areceber')" id="nav-areceber">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -2439,11 +2438,13 @@ th.ef-th { padding:8px 8px 8px 12px; }
     </div>
     <div class="grid3">
       <div class="form-group"><label class="label-add">Despesas/Fornecedor<button type="button" class="btn-add-inline" title="Cadastrar nova despesa/fornecedor" onclick="abrirCadastroRapido('fornecedor','l-forn')">+</button></label><select id="l-forn"><option value="">Selecione...</option></select></div>
-      <div class="form-group"><label class="label-add">Item<button type="button" class="btn-add-inline" title="Cadastrar novo item" onclick="abrirCadastroRapido('produto','l-prod')">+</button></label><select id="l-prod"><option value="">Nenhum (opcional)</option></select></div>
+      <div class="form-group"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','l-catdre')">+</button></label><select id="l-catdre" onchange="onCategoriaChangeUsuario('l-catdre','l-subcat')"><option value="">Nenhuma</option></select></div>
       <div class="form-group"><label>Valor Total (R$) *</label><input id="l-valor" type="number" step="0.01" placeholder="0,00" /></div>
     </div>
-    <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','l-catdre')">+</button></label><select id="l-catdre" onchange="onCategoriaChangeUsuario('l-catdre','l-subcat')"><option value="">Nenhuma</option></select></div><div class="form-group" style="grid-column:span 2"><label>Subcategoria <span class="subcat-req" style="color:#dc2626">*</span></label><select id="l-subcat" onchange="onSubcategoriaChange('l-catdre','l-subcat')"><option value="">Nenhuma</option></select></div>
+    <!-- Item e Subcategoria ocultados a pedido; mantidos no DOM para compatibilidade -->
+    <div style="display:none">
+      <div class="form-group"><label class="label-add">Item<button type="button" class="btn-add-inline" title="Cadastrar novo item" onclick="abrirCadastroRapido('produto','l-prod')">+</button></label><select id="l-prod"><option value="">Nenhum (opcional)</option></select></div>
+      <div class="form-group"><label>Subcategoria</label><select id="l-subcat" onchange="onSubcategoriaChange('l-catdre','l-subcat')"><option value="">Nenhuma</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group">
@@ -2517,7 +2518,7 @@ th.ef-th { padding:8px 8px 8px 12px; }
 
 <!-- ══ MODAL CRIAR LANÇAMENTO — RECEBIMENTO ══ -->
 <div class="modal-overlay" id="modal-novo-lr">
-  <div class="modal" style="width:720px;">
+  <div class="modal modal-compacto" style="width:720px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
       <div class="modal-title" style="margin-bottom:0;">💰 Novo Lançamento — Recebimento</div>
       <button onclick="closeModal('modal-novo-lr')" style="background:none;border:none;cursor:pointer;color:#a8a29e;font-size:22px;line-height:1;padding:4px;" title="Fechar">✕</button>
@@ -2531,12 +2532,13 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Nº da Nota Fiscal</label><input id="lr-nf" type="text" placeholder="000000" /></div>
     </div>
     <div class="grid3">
-      <div class="form-group"><label class="label-add">Cliente *<button type="button" class="btn-add-inline" title="Cadastrar novo cliente" onclick="abrirCadastroRapido('cliente','lr-cliente')">+</button></label><select id="lr-cliente"><option value="">Selecione...</option></select></div>
-      <div class="form-group"><label class="label-add">Produto de Venda<button type="button" class="btn-add-inline" title="Cadastrar novo produto de venda" onclick="abrirCadastroRapido('prodvenda','lr-prod')">+</button></label><select id="lr-prod"><option value="">Selecione...</option></select></div>
+      <div class="form-group"><label class="label-add">Cliente<button type="button" class="btn-add-inline" title="Cadastrar novo cliente" onclick="abrirCadastroRapido('cliente','lr-cliente')">+</button></label><select id="lr-cliente"><option value="">Selecione...</option></select></div>
+      <div class="form-group"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','lr-catdre')">+</button></label><select id="lr-catdre"><option value="">Nenhuma</option></select></div>
       <div class="form-group"><label>Valor Total (R$) *</label><input id="lr-valor" type="number" step="0.01" placeholder="0,00" /></div>
     </div>
-    <div class="grid3">
-      <div class="form-group" style="grid-column:span 2"><label class="label-add">Categoria<button type="button" class="btn-add-inline" title="Cadastrar nova categoria" onclick="abrirCadastroRapido('categoria','lr-catdre')">+</button></label><select id="lr-catdre"><option value="">Nenhuma</option></select></div>
+    <!-- Produto de Venda ocultado a pedido; mantido no DOM para compatibilidade -->
+    <div style="display:none">
+      <div class="form-group"><label class="label-add">Produto de Venda<button type="button" class="btn-add-inline" title="Cadastrar novo produto de venda" onclick="abrirCadastroRapido('prodvenda','lr-prod')">+</button></label><select id="lr-prod"><option value="">Selecione...</option></select></div>
     </div>
     <div class="grid3">
       <div class="form-group"><label>Número de Parcelas</label>
@@ -2581,8 +2583,6 @@ th.ef-th { padding:8px 8px 8px 12px; }
       <div class="form-group"><label>Banco / Conta</label>
         <select id="lr-banco"><option value="">Não informado</option></select>
       </div>
-    </div>
-    <div class="grid3">
       <div class="form-group"><label>Taxa de Juros (% ao mês)</label>
         <input id="lr-juros" type="number" step="0.01" min="0" placeholder="Deixe vazio para usar padrão" />
       </div>
@@ -5078,7 +5078,7 @@ async function saveLancamento() {
   const prod = document.getElementById('l-prod').value;
   const valor = parseFloat(document.getElementById('l-valor').value);
   if(!dtcompra || !valor) { alert('Preencha data da compra e valor.'); return; }
-  if (!validarSubcategoria('l-catdre','l-subcat')) return;
+  // Subcategoria ocultada nesta tela e não é mais obrigatória.
   // Fornecedor e produto são opcionais: nem toda despesa tem um fornecedor
   // cadastrado (ex.: tarifas bancárias, impostos, taxas avulsas).
   const pago = document.getElementById('l-pago').value;
@@ -8286,7 +8286,7 @@ function applyNavPermissions() {
   });
   // Telas desativadas por decisão do cliente — somem do menu para todos os
   // perfis (inclusive admin), mesmo que a permissão exista.
-  ['dfc-subcategorias','dfc-lancamentos','dre-analise-subcat'].forEach(pg => {
+  ['dfc-subcategorias','dfc-lancamentos','dre-analise-subcat','produtos','prodvenda'].forEach(pg => {
     const el = document.getElementById('nav-' + pg);
     if (el) el.style.display = 'none';
   });
@@ -8688,7 +8688,7 @@ async function saveLancReceber() {
   const dtvenda=document.getElementById('lr-dtvenda').value;
   const cliente=document.getElementById('lr-cliente').value;
   const valor=parseFloat(document.getElementById('lr-valor').value);
-  if(!dtvenda||!cliente||!valor){ alert('Preencha data, cliente e valor.'); return; }
+  if(!dtvenda||!valor){ alert('Preencha data e valor.'); return; }
   const recebido=document.getElementById('lr-recebido').value;
   const banco=document.getElementById('lr-banco').value;
   if (!validarBancoObrigatorio(recebido, banco)) return;
@@ -11289,51 +11289,105 @@ function renderDre() {
   // "somente classificados" está desmarcado), para o DRE bater com o total vendido.
   const grupoBaseId = (gruposValor.find(g => g.tipo === 'entrada') || gruposValor[0] || {}).id;
 
-  // 1. Lançamentos a Receber (competência = data da venda; vencimento = previsão)
-  db.lancreceber.forEach(l => {
-    const dtRef = dreBase === 'vencimento' ? (l.dtprev || l.dtvenda || l.dtcompra) : (l.dtvenda || l.dtcompra);
-    if (!dtRef) return;
-    const parts = dtRef.split('-');
-    if (parseInt(parts[0]) !== ano) return;
-    const m = parseInt(parts[1]);
-    const prodObj = db.prodvenda.find(x => x.id === l.prod);
-    const catId = l.cat_dre || (prodObj ? prodObj.cat : null);
-    if (!catId) { if (somenteClassificados) return; }
-    let grupoId = catId ? getDreCatGrupo(catId) : null;
-    // Venda sem grupo de DRE => conta como Receita Bruta (grupo-base)
-    if (!grupoId && !somenteClassificados) grupoId = grupoBaseId;
-    if (grupoId && valoresMes[m][grupoId] !== undefined) {
-      valoresMes[m][grupoId] += (l.valor || 0);
-      if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (l.valor || 0);
-      itensMes[m][grupoId].push({
-        id: l.id, tipo: 'receber', data: dtRef, nome: getClienteNome(l.cliente),
-        prod: l.prod ? getProdVendaNome(l.prod) : '', valor: l.valor || 0,
-        status: l.recebido === 'sim' ? 'Recebido' : 'A Receber', catId: catId || null
-      });
-    }
-  });
+  // 1. Lançamentos a Receber
+  //    Competência = valor cheio na data da venda.
+  //    Vencimento  = cada parcela entra no mês do seu próprio vencimento
+  //    (parcela_datas / previsão), para o DRE por vencimento refletir empréstimos,
+  //    vendas com categoria por produto e demais grupos parcelados corretamente.
+  if (dreBase === 'vencimento') {
+    getParcelasReceber(false).concat(getParcelasReceber(true)).forEach(p => {
+      const dtRef = p.venc || p.dtvenda;
+      if (!dtRef) return;
+      const parts = dtRef.split('-');
+      if (parseInt(parts[0]) !== ano) return;
+      const m = parseInt(parts[1]);
+      const catId = p.catId || null;
+      if (!catId && somenteClassificados) return;
+      let grupoId = catId ? getDreCatGrupo(catId) : null;
+      // Venda sem grupo de DRE => conta como Receita Bruta (grupo-base)
+      if (!grupoId && !somenteClassificados) grupoId = grupoBaseId;
+      if (grupoId && valoresMes[m][grupoId] !== undefined) {
+        valoresMes[m][grupoId] += (p.valParc || 0);
+        if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (p.valParc || 0);
+        itensMes[m][grupoId].push({
+          id: p.lancId, tipo: 'receber', data: dtRef, nome: getClienteNome(p.cliente),
+          prod: p.prod ? getProdVendaNome(p.prod) : '', valor: p.valParc || 0,
+          status: p.isRecebido ? 'Recebido' : 'A Receber', catId: catId || null
+        });
+      }
+    });
+  } else {
+    db.lancreceber.forEach(l => {
+      const dtRef = l.dtvenda || l.dtcompra;
+      if (!dtRef) return;
+      const parts = dtRef.split('-');
+      if (parseInt(parts[0]) !== ano) return;
+      const m = parseInt(parts[1]);
+      const prodObj = db.prodvenda.find(x => x.id === l.prod);
+      const catId = l.cat_dre || (prodObj ? prodObj.cat : null);
+      if (!catId) { if (somenteClassificados) return; }
+      let grupoId = catId ? getDreCatGrupo(catId) : null;
+      // Venda sem grupo de DRE => conta como Receita Bruta (grupo-base)
+      if (!grupoId && !somenteClassificados) grupoId = grupoBaseId;
+      if (grupoId && valoresMes[m][grupoId] !== undefined) {
+        valoresMes[m][grupoId] += (l.valor || 0);
+        if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (l.valor || 0);
+        itensMes[m][grupoId].push({
+          id: l.id, tipo: 'receber', data: dtRef, nome: getClienteNome(l.cliente),
+          prod: l.prod ? getProdVendaNome(l.prod) : '', valor: l.valor || 0,
+          status: l.recebido === 'sim' ? 'Recebido' : 'A Receber', catId: catId || null
+        });
+      }
+    });
+  }
 
-  // 2. Lançamentos a Pagar (competência = data da compra; vencimento = previsão)
-  db.lancamentos.forEach(l => {
-    const dtRef = dreBase === 'vencimento' ? (l.dtprev || l.dtcompra) : l.dtcompra;
-    if (!dtRef) return;
-    const parts = dtRef.split('-');
-    if (parseInt(parts[0]) !== ano) return;
-    const m = parseInt(parts[1]);
-    const prodObj = db.produtos.find(x => x.id === l.prod);
-    const catId = l.cat_dre || (prodObj ? prodObj.cat : null);
-    if (!catId) { if (somenteClassificados) return; }
-    const grupoId = catId ? getDreCatGrupo(catId) : null;
-    if (grupoId && valoresMes[m][grupoId] !== undefined) {
-      valoresMes[m][grupoId] += (l.valor || 0);
-      if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (l.valor || 0);
-      itensMes[m][grupoId].push({
-        id: l.id, tipo: 'pagar', data: dtRef, nome: getFornNome(l.forn),
-        prod: l.prod ? getProdNome(l.prod) : '', valor: l.valor || 0,
-        status: l.pago === 'sim' ? 'Pago' : 'A Pagar', catId: catId || null
-      });
-    }
-  });
+  // 2. Lançamentos a Pagar
+  //    Competência = valor cheio na data da compra.
+  //    Vencimento  = cada parcela entra no mês do seu próprio vencimento
+  //    (parcela_datas / previsão), fazendo empréstimos, gastos com categoria por
+  //    produto e o grupo Investimentos mudarem de mês ao alternar a base.
+  if (dreBase === 'vencimento') {
+    getParcelas(false).concat(getParcelas(true)).forEach(p => {
+      const dtRef = p.venc || p.dtcompra;
+      if (!dtRef) return;
+      const parts = dtRef.split('-');
+      if (parseInt(parts[0]) !== ano) return;
+      const m = parseInt(parts[1]);
+      const catId = p.catId || null;
+      if (!catId && somenteClassificados) return;
+      const grupoId = catId ? getDreCatGrupo(catId) : null;
+      if (grupoId && valoresMes[m][grupoId] !== undefined) {
+        valoresMes[m][grupoId] += (p.valParc || 0);
+        if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (p.valParc || 0);
+        itensMes[m][grupoId].push({
+          id: p.lancId, tipo: 'pagar', data: dtRef, nome: getFornNome(p.forn),
+          prod: p.prod ? getProdNome(p.prod) : '', valor: p.valParc || 0,
+          status: p.isPago ? 'Pago' : 'A Pagar', catId: catId || null
+        });
+      }
+    });
+  } else {
+    db.lancamentos.forEach(l => {
+      const dtRef = l.dtcompra;
+      if (!dtRef) return;
+      const parts = dtRef.split('-');
+      if (parseInt(parts[0]) !== ano) return;
+      const m = parseInt(parts[1]);
+      const prodObj = db.produtos.find(x => x.id === l.prod);
+      const catId = l.cat_dre || (prodObj ? prodObj.cat : null);
+      if (!catId) { if (somenteClassificados) return; }
+      const grupoId = catId ? getDreCatGrupo(catId) : null;
+      if (grupoId && valoresMes[m][grupoId] !== undefined) {
+        valoresMes[m][grupoId] += (l.valor || 0);
+        if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (l.valor || 0);
+        itensMes[m][grupoId].push({
+          id: l.id, tipo: 'pagar', data: dtRef, nome: getFornNome(l.forn),
+          prod: l.prod ? getProdNome(l.prod) : '', valor: l.valor || 0,
+          status: l.pago === 'sim' ? 'Pago' : 'A Pagar', catId: catId || null
+        });
+      }
+    });
+  }
 
   // Injeta a Variação de Estoque digitada manualmente (não vem de lançamentos).
   // O valor digitado (positivo ou negativo) é SOMADO diretamente ao grupo do CPV,
