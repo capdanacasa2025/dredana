@@ -3593,7 +3593,63 @@ async function supabaseAuthLogout() {
   limparSessaoAuth();
 }
 
+// ── Padronização de nomes: primeira letra de cada palavra maiúscula ──
+// Aplica-se ao campo "nome" de Fornecedores, Clientes, Produtos e Produtos de Venda.
+// Conectivos (de, da, do, das, dos, e) ficam minúsculos quando não são a 1ª palavra.
+const TABELAS_NOME_PADRAO = { fornecedores:'fornecedores', clientes:'clientes', produtos:'produtos', prodvenda:'prodvenda' };
+const NOME_CONECTIVOS = new Set(['de','da','do','das','dos','e']);
+function nomeTitulo(txt) {
+  if (typeof txt !== 'string') return txt;
+  const limpo = txt.replace(/\s+/g, ' ').trim();
+  if (!limpo) return limpo;
+  return limpo.toLocaleLowerCase('pt-BR').split(' ').map((w, i) => {
+    if (i > 0 && NOME_CONECTIVOS.has(w)) return w;
+    return w.replace(/(^|[-\/('".])(\p{L})/gu, (m, sep, ch) => sep + ch.toLocaleUpperCase('pt-BR'));
+  }).join(' ');
+}
+function _padronizarNomeBody(table, method, body, params) {
+  if (!TABELAS_NOME_PADRAO[table] || (method !== 'POST' && method !== 'PATCH') || !body) return;
+  const lista = Array.isArray(body) ? body : [body];
+  lista.forEach(o => { if (o && typeof o.nome === 'string') o.nome = nomeTitulo(o.nome); });
+  // Mantém a lista em memória igual ao que foi gravado (edições via PATCH ?id=eq.X)
+  if (method === 'PATCH' && !Array.isArray(body) && typeof body.nome === 'string' && db && Array.isArray(db[table])) {
+    const m = /id=eq\.([^&]+)/.exec(params || '');
+    if (m) {
+      const idStr = decodeURIComponent(m[1]);
+      const rec = db[table].find(x => String(x.id) === idStr);
+      if (rec) rec.nome = body.nome;
+    }
+  }
+}
+// Corrige os nomes já cadastrados (roda após carregar os dados; só grava o que estiver diferente).
+let _corrigindoNomes = false;
+async function corrigirNomesExistentes() {
+  if (_corrigindoNomes) return;
+  _corrigindoNomes = true;
+  try {
+    const pend = [];
+    Object.keys(TABELAS_NOME_PADRAO).forEach(t => {
+      (db[t] || []).forEach(r => {
+        if (typeof r.nome !== 'string') return;
+        const novo = nomeTitulo(r.nome);
+        if (novo !== r.nome) { r.nome = novo; pend.push({ t, id: r.id, nome: novo }); }
+      });
+    });
+    if (!pend.length) return;
+    for (let i = 0; i < pend.length; i += 5) {
+      await Promise.all(pend.slice(i, i + 5).map(p =>
+        sbFetch(p.t, 'PATCH', { nome: p.nome }, `?id=eq.${encodeURIComponent(p.id)}`)));
+    }
+    console.info(`[477] Nomes padronizados: ${pend.length} registro(s).`);
+  } catch(e) {
+    console.warn('[477] Falha ao padronizar nomes:', e);
+  } finally {
+    _corrigindoNomes = false;
+  }
+}
+
 async function sbFetch(table, method='GET', body=null, params='') {
+  _padronizarNomeBody(table, method, body, params);
   if ((method === 'POST' || method === 'PATCH' || method === 'DELETE') && table !== 'config' && typeof currentUser !== 'undefined' && currentUser) {
     trackUserActivity();
   }
@@ -3825,6 +3881,8 @@ async function loadAllData() {
     db.lancreceber  = val(8)  || [];
     db.dfc_cats     = val(9)  || [];
     db.dfc_subcats  = val(18) || [];
+    // Padroniza os nomes já cadastrados (memória + banco, em segundo plano).
+    corrigirNomesExistentes();
     db.dfc_lans     = val(10) || [];
     db.bancos       = val(11) || [];
     db.transferencias = val(13) || [];
