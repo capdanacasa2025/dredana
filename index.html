@@ -349,6 +349,28 @@ th.ef-th { padding:8px 8px 8px 12px; }
 .dre-lucro-tag.pos { background:#dcfce7; color:#166534; }
 .dre-lucro-tag.neg { background:#fee2e2; color:#991b1b; }
 .dre-mes-chip { display:inline-flex; align-items:center; gap:4px; font-size:12px; padding:3px 9px; border:1px solid #e7e5e4; border-radius:12px; cursor:pointer; user-select:none; color:#57534e; }
+/* Lista suspensa: grupos por vencimento (DRE) */
+.dre-gv-btn { min-width:260px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 12px; font-size:13px; background:#fff; border:1px solid #e7e5e4; border-radius:8px; cursor:pointer; color:#44403c; transition:border-color .15s; }
+.dre-gv-btn:hover, .dre-gv-btn.aberto { border-color:#ea580c; }
+.dre-gv-btn .seta { font-size:10px; color:#a8a29e; transition:transform .15s; }
+.dre-gv-btn.aberto .seta { transform:rotate(180deg); color:#ea580c; }
+.dre-gv-painel { position:absolute; top:calc(100% + 6px); left:0; z-index:50; width:380px; background:#fff; border:1px solid #e7e5e4; border-radius:10px; box-shadow:0 12px 32px rgba(28,25,23,.14); overflow:hidden; }
+.dre-gv-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 14px; background:#fafaf9; border-bottom:1px solid #f0efed; }
+.dre-gv-head .titulo { white-space:nowrap; font-size:11px; font-weight:600; color:#78716c; text-transform:uppercase; letter-spacing:.6px; }
+.dre-gv-head .acoes { display:flex; gap:12px; white-space:nowrap; }
+.dre-gv-head .acoes a { font-size:12px; color:#ea580c; cursor:pointer; text-decoration:none; font-weight:500; }
+.dre-gv-head .acoes a:hover { text-decoration:underline; }
+.dre-gv-lista { max-height:340px; overflow-y:auto; padding:4px 0; }
+.dre-gv-painel label.dre-gv-item { display:flex; align-items:center; gap:10px; margin:0; padding:8px 14px; font-size:13px; font-weight:400; color:#292524; cursor:pointer; text-align:left; line-height:1.3; }
+.dre-gv-painel label.dre-gv-item:hover { background:#fff7ed; }
+.dre-gv-painel label.dre-gv-item.sub { padding-left:40px; font-size:12px; color:#57534e; background:#fafaf9; }
+.dre-gv-painel label.dre-gv-item.sub:hover { background:#fff7ed; }
+.dre-gv-painel label.dre-gv-item.desab { opacity:.5; cursor:default; }
+.dre-gv-painel input[type=checkbox] { flex:0 0 auto; width:15px; height:15px; margin:0; padding:0; accent-color:#ea580c; cursor:pointer; }
+.dre-gv-painel .nome { flex:1 1 auto; min-width:0; }
+.dre-gv-painel .sub-toggle { flex:0 0 auto; font-size:11px; font-weight:500; color:#ea580c; padding:2px 8px; border:1px solid #fed7aa; border-radius:10px; background:#fff; white-space:nowrap; }
+.dre-gv-painel .sub-toggle:hover { background:#ffedd5; }
+.dre-gv-foot { padding:8px 14px; font-size:11px; color:#a8a29e; border-top:1px solid #f0efed; background:#fafaf9; line-height:1.4; }
 .dre-mes-chip input { width:12px; height:12px; margin:0; accent-color:#ea580c; cursor:pointer; }
 #dre-tabela-wrap .dfc-table th { padding:5px 10px; font-size:10px; }
 #dre-tabela-wrap .dfc-table td { padding:3px 10px; font-size:11px; }
@@ -1865,13 +1887,29 @@ th.ef-th { padding:8px 8px 8px 12px; }
           </label>
           <span style="font-size:11px;color:#a8a29e;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">Base:</span>
           <select id="dre-base" onchange="renderDre()" style="width:150px;padding:6px 10px;font-size:13px;" title="Competência = data da compra/venda; Vencimento = data prevista de pagamento/recebimento">
-            <option value="competencia">Competência</option>
+            <option value="competencia" selected>Competência</option>
             <option value="vencimento">Vencimento</option>
           </select>
           <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
             <input type="checkbox" id="dre-mostrar-percent" checked onchange="renderDre()" />
             Mostrar % por mês
           </label>
+        </div>
+        <div id="dre-grupos-comp-box" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f5f4f2;">
+          <span style="font-size:11px;color:#a8a29e;font-weight:600;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;" title="Grupos marcados são calculados pelo vencimento das parcelas; os desmarcados, pela competência (data da compra/venda)">Selecione os grupos por vencimento:</span>
+          <div id="dre-grupos-comp-dd" style="position:relative;">
+            <button type="button" id="dre-grupos-comp-btn" class="dre-gv-btn" onclick="toggleDreGruposCompDd(event)">
+              <span id="dre-grupos-comp-resumo">Todos os grupos</span><span class="seta">▼</span>
+            </button>
+            <div id="dre-grupos-comp-painel" class="dre-gv-painel" onclick="event.stopPropagation()" style="display:none;">
+              <div class="dre-gv-head">
+                <span class="titulo">Grupos por vencimento</span>
+                <span class="acoes"><a onclick="dreGruposCompTodos(true)">Marcar todos</a><a onclick="dreGruposCompTodos(false)">Desmarcar todos</a></span>
+              </div>
+              <div id="dre-grupos-comp-lista" class="dre-gv-lista"></div>
+              <div class="dre-gv-foot">Desmarcados são calculados por competência (data da compra/venda).</div>
+            </div>
+          </div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f5f4f2;">
           <span style="font-size:11px;color:#a8a29e;font-weight:600;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;">Meses visíveis:</span>
@@ -11289,6 +11327,13 @@ function renderDre() {
   // "somente classificados" está desmarcado), para o DRE bater com o total vendido.
   const grupoBaseId = (gruposValor.find(g => g.tipo === 'entrada') || gruposValor[0] || {}).id;
 
+  // Grupos que, mesmo com Base = Vencimento, são calculados por Competência.
+  renderDreGruposCompBox(gruposValor, dreBase);
+  const gruposComp = dreBase === 'vencimento' ? getDreGruposComp() : new Set();
+  const usaComp = (grupoId, catId) => dreBase !== 'vencimento'
+    || gruposComp.has(String(grupoId)) || gruposComp.has('g:' + grupoId)
+    || (catId != null && gruposComp.has('c:' + catId));
+
   // 1. Lançamentos a Receber
   //    Competência = valor cheio na data da venda.
   //    Vencimento  = cada parcela entra no mês do seu próprio vencimento
@@ -11306,6 +11351,7 @@ function renderDre() {
       let grupoId = catId ? getDreCatGrupo(catId) : null;
       // Venda sem grupo de DRE => conta como Receita Bruta (grupo-base)
       if (!grupoId && !somenteClassificados) grupoId = grupoBaseId;
+      if (grupoId && usaComp(grupoId, catId)) return;
       if (grupoId && valoresMes[m][grupoId] !== undefined) {
         valoresMes[m][grupoId] += (p.valParc || 0);
         if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (p.valParc || 0);
@@ -11316,7 +11362,8 @@ function renderDre() {
         });
       }
     });
-  } else {
+  }
+  {
     db.lancreceber.forEach(l => {
       const dtRef = l.dtvenda || l.dtcompra;
       if (!dtRef) return;
@@ -11329,6 +11376,7 @@ function renderDre() {
       let grupoId = catId ? getDreCatGrupo(catId) : null;
       // Venda sem grupo de DRE => conta como Receita Bruta (grupo-base)
       if (!grupoId && !somenteClassificados) grupoId = grupoBaseId;
+      if (!grupoId || !usaComp(grupoId, catId)) return;
       if (grupoId && valoresMes[m][grupoId] !== undefined) {
         valoresMes[m][grupoId] += (l.valor || 0);
         if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (l.valor || 0);
@@ -11356,6 +11404,7 @@ function renderDre() {
       const catId = p.catId || null;
       if (!catId && somenteClassificados) return;
       const grupoId = catId ? getDreCatGrupo(catId) : null;
+      if (grupoId && usaComp(grupoId, catId)) return;
       if (grupoId && valoresMes[m][grupoId] !== undefined) {
         valoresMes[m][grupoId] += (p.valParc || 0);
         if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (p.valParc || 0);
@@ -11366,7 +11415,8 @@ function renderDre() {
         });
       }
     });
-  } else {
+  }
+  {
     db.lancamentos.forEach(l => {
       const dtRef = l.dtcompra;
       if (!dtRef) return;
@@ -11377,6 +11427,7 @@ function renderDre() {
       const catId = l.cat_dre || (prodObj ? prodObj.cat : null);
       if (!catId) { if (somenteClassificados) return; }
       const grupoId = catId ? getDreCatGrupo(catId) : null;
+      if (!grupoId || !usaComp(grupoId, catId)) return;
       if (grupoId && valoresMes[m][grupoId] !== undefined) {
         valoresMes[m][grupoId] += (l.valor || 0);
         if (catId && valoresCatMes[m][catId] !== undefined) valoresCatMes[m][catId] += (l.valor || 0);
@@ -11626,6 +11677,112 @@ function renderDre() {
 
   wrap.innerHTML = html;
   renderDreChart(grupos, gruposValor, linhaCalc, ultimoSubtotalId);
+}
+
+// Grupos calculados por competência quando a Base = Vencimento.
+// Seleção salva no navegador, por empresa.
+function _dreGruposCompKey() { return 'dre_grupos_comp_' + (empresaAtual() || 'default'); }
+function getDreGruposComp() {
+  try { return new Set(JSON.parse(localStorage.getItem(_dreGruposCompKey()) || '[]').map(String)); }
+  catch(e) { return new Set(); }
+}
+function setDreGruposComp(set) {
+  try { localStorage.setItem(_dreGruposCompKey(), JSON.stringify([...set])); } catch(e) {}
+}
+// Grupo do CMV/CPV (aceita também nomes com "CMV" / "custo da mercadoria").
+function _dreGrupoCmvCpvId(gruposValor) {
+  const id = getGrupoCpvId();
+  if (id) return id;
+  const g = gruposValor.find(g => {
+    const n = normText(g.nome || '');
+    return n.includes('cmv') || (n.includes('custo') && n.includes('mercadoria'));
+  });
+  return g ? g.id : null;
+}
+let _dreCmvAberto = false;
+let _dreGruposValorCache = [];
+// Lista suspensa "Selecione os grupos por vencimento".
+// Marcado = vencimento; desmarcado = competência. Internamente guarda o
+// conjunto de exceções por competência (g:<grupo> / c:<categoria>).
+function renderDreGruposCompBox(gruposValor, dreBase) {
+  const box = document.getElementById('dre-grupos-comp-box');
+  const lista = document.getElementById('dre-grupos-comp-lista');
+  if (!box || !lista) return;
+  if (dreBase !== 'vencimento') {
+    box.style.display = 'none';
+    const painel = document.getElementById('dre-grupos-comp-painel');
+    if (painel) painel.style.display = 'none';
+    const btn = document.getElementById('dre-grupos-comp-btn');
+    if (btn) btn.classList.remove('aberto');
+    return;
+  }
+  box.style.display = 'flex';
+  _dreGruposValorCache = gruposValor;
+  const sel = getDreGruposComp();
+  const esc = (v) => String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const grupoComp = (g) => sel.has(String(g.id)) || sel.has('g:' + g.id);
+  const cmvId = _dreGrupoCmvCpvId(gruposValor);
+  let html = '';
+  let qtdVenc = 0, subCompCmv = 0;
+  gruposValor.forEach(g => {
+    const porComp = grupoComp(g);
+    if (!porComp) qtdVenc++;
+    const ehCmv = cmvId && String(g.id) === String(cmvId);
+    const cats = ehCmv ? db.dfc_cats.filter(c => String(c.grupo) === String(g.id)) : [];
+    if (ehCmv && !porComp) subCompCmv = cats.filter(c => sel.has('c:' + c.id)).length;
+    const toggle = ehCmv && cats.length
+      ? `<span class="sub-toggle" onclick="event.preventDefault();event.stopPropagation();toggleDreCmvSub()">${_dreCmvAberto ? '▾' : '▸'} Subcategorias</span>`
+      : '';
+    html += `<label class="dre-gv-item"><input type="checkbox" data-grupo-comp="g:${esc(g.id)}" ${porComp ? '' : 'checked'} onchange="toggleDreGrupoComp(this)" /><span class="nome">${esc(g.nome)}</span>${toggle}</label>`;
+    if (ehCmv && _dreCmvAberto) {
+      cats.forEach(c => {
+        const venc = !porComp && !sel.has('c:' + c.id);
+        html += `<label class="dre-gv-item sub${porComp ? ' desab' : ''}"${porComp ? ' title="Grupo inteiro por competência"' : ''}><input type="checkbox" data-cat-comp="c:${esc(c.id)}" ${venc ? 'checked' : ''} ${porComp ? 'disabled' : ''} onchange="toggleDreGrupoComp(this)" /><span class="nome">${esc(c.nome)}</span></label>`;
+      });
+    }
+  });
+  lista.innerHTML = html;
+  const resumo = document.getElementById('dre-grupos-comp-resumo');
+  if (resumo) {
+    const total = gruposValor.length;
+    let txt = qtdVenc === total ? 'Todos os grupos' : qtdVenc === 0 ? 'Nenhum grupo' : `${qtdVenc} de ${total} grupos`;
+    if (subCompCmv) txt += ` · CPV/CMV parcial`;
+    resumo.textContent = txt;
+  }
+}
+function toggleDreGruposCompDd(ev) {
+  if (ev) ev.stopPropagation();
+  const painel = document.getElementById('dre-grupos-comp-painel');
+  if (!painel) return;
+  const abrir = painel.style.display === 'none';
+  painel.style.display = abrir ? 'block' : 'none';
+  const btn = document.getElementById('dre-grupos-comp-btn');
+  if (btn) btn.classList.toggle('aberto', abrir);
+}
+document.addEventListener('click', () => {
+  const painel = document.getElementById('dre-grupos-comp-painel');
+  if (painel) painel.style.display = 'none';
+  const btn = document.getElementById('dre-grupos-comp-btn');
+  if (btn) btn.classList.remove('aberto');
+});
+function toggleDreCmvSub() {
+  _dreCmvAberto = !_dreCmvAberto;
+  renderDreGruposCompBox(_dreGruposValorCache, 'vencimento');
+}
+function toggleDreGrupoComp(el) {
+  const sel = getDreGruposComp();
+  const key = el.getAttribute('data-grupo-comp') || el.getAttribute('data-cat-comp');
+  if (key.startsWith('g:')) sel.delete(key.slice(2)); // remove formato antigo (id sem prefixo)
+  if (el.checked) sel.delete(key); else sel.add(key);   // marcado = vencimento
+  setDreGruposComp(sel);
+  renderDre();
+}
+function dreGruposCompTodos(marcar) {
+  // Marcar todos = todos por vencimento (sem exceções); Desmarcar = todos por competência.
+  const sel = new Set();
+  if (!marcar) document.querySelectorAll('[data-grupo-comp]').forEach(el => sel.add(el.getAttribute('data-grupo-comp')));
+  setDreGruposComp(sel);
+  renderDre();
 }
 
 function dreMesesTodos(mostrar) {
