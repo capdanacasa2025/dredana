@@ -2754,13 +2754,14 @@ th.ef-th { padding:8px 8px 8px 12px; }
         <select id="elr-financeiro"><option value="nao">Não</option><option value="sim">Sim</option></select>
       </div>
       <div class="form-group"><label>Recebido?</label>
-        <select id="elr-recebido"><option value="nao">Não</option><option value="sim">Sim</option></select>
+        <select id="elr-recebido" onchange="toggleDataEdicao('elr-recebido','elr-dtrecebido-wrap','elr-dtrecebido')"><option value="nao">Não</option><option value="sim">Sim</option></select>
       </div>
     </div>
     <div class="grid3">
       <div class="form-group"><label>Banco / Conta *</label>
         <select id="elr-banco"><option value="">Não informado</option></select>
       </div>
+      <div class="form-group" id="elr-dtrecebido-wrap" style="display:none"><label>Data de Recebimento <span style="color:#dc2626">*</span></label><input id="elr-dtrecebido" type="date" /></div>
     </div>
     <!-- Datas manuais de parcelas no modal -->
     <div id="elr-parcela-dates" style="display:none;margin-bottom:16px;">
@@ -3084,13 +3085,14 @@ th.ef-th { padding:8px 8px 8px 12px; }
         <select id="edit-financeiro"><option value="nao">Não</option><option value="sim">Sim</option></select>
       </div>
       <div class="form-group"><label>Pago?</label>
-        <select id="edit-pago"><option value="nao">Não</option><option value="sim">Sim</option></select>
+        <select id="edit-pago" onchange="toggleDataEdicao('edit-pago','edit-dtpago-wrap','edit-dtpago')"><option value="nao">Não</option><option value="sim">Sim</option></select>
       </div>
     </div>
     <div class="grid3">
       <div class="form-group"><label>Banco / Conta *</label>
         <select id="edit-banco"><option value="">Não informado</option></select>
       </div>
+      <div class="form-group" id="edit-dtpago-wrap" style="display:none"><label>Data de Pagamento <span style="color:#dc2626">*</span></label><input id="edit-dtpago" type="date" /></div>
     </div>
     <!-- Datas manuais de parcelas no modal -->
     <div id="edit-parcela-dates" style="display:none;margin-bottom:16px;">
@@ -4251,6 +4253,15 @@ function toggleDataPagamento() {
   if (!mostrar && inp) inp.value = '';
 }
 
+// Telas de edição — mostra a data de pagamento/recebimento quando "Sim".
+function toggleDataEdicao(selId, wrapId, inpId) {
+  const sel = document.getElementById(selId), wrap = document.getElementById(wrapId), inp = document.getElementById(inpId);
+  if (!sel || !wrap) return;
+  const mostrar = sel.value === 'sim';
+  wrap.style.display = mostrar ? '' : 'none';
+  if (mostrar && inp && !inp.value) inp.value = today();
+}
+
 // Item 8 — mostra/oculta o campo "Data de Recebimento" conforme o "Recebido?".
 function toggleDataRecebimento() {
   const sel = document.getElementById('lr-recebido');
@@ -5211,11 +5222,15 @@ async function saveLancamento() {
     const meses = _mesesEntreVigencia(vigInicio, vigFim);
     if (meses.length > 60) { alert('Vigência muito longa (máximo 60 meses). Reduza o período.'); return; }
     const fixoGrupo = uid();
-    const novos = meses.map(({ano, mes}) => ({
+    const novos = meses.map(({ano, mes}, idx) => ({
       id: uid(),
       dtcompra: _dataComDiaFixo(ano, mes, dia),
-      dtprev: '',
       ...baseRec,
+      // Vencimento = a própria data de cada mês
+      dtprev: _dataComDiaFixo(ano, mes, dia),
+      // "Pago? = Sim" vale só para o primeiro mês; os demais ficam em aberto
+      pago: (idx === 0 && baseRec.pago === 'sim') ? 'sim' : 'nao',
+      dtpago: (idx === 0 && baseRec.pago === 'sim') ? baseRec.dtpago : '',
       parcelas: 1,
       parcela_datas: null,
       fixo: true,
@@ -5388,6 +5403,8 @@ function editLancamento(id) {
   document.getElementById('edit-parcelas').value = l.parcelas;
   document.getElementById('edit-financeiro').value = l.financeiro;
   document.getElementById('edit-pago').value = l.pago;
+  document.getElementById('edit-dtpago').value = l.dtpago || '';
+  toggleDataEdicao('edit-pago','edit-dtpago-wrap','edit-dtpago');
   document.getElementById('edit-obs').value = l.obs||'';
   const eb = document.getElementById('edit-banco');
   if (eb) eb.value = l.banco || '';
@@ -5422,6 +5439,8 @@ async function updateLancamento() {
   const l = db.lancamentos.find(x=>x.id===id);
   if(!l) return;
   const pago = document.getElementById('edit-pago').value;
+  const dtpagoEdit = document.getElementById('edit-dtpago').value;
+  if (pago === 'sim' && !dtpagoEdit) { alert('Informe a data de pagamento.'); return; }
   const banco = document.getElementById('edit-banco') ? document.getElementById('edit-banco').value : (l.banco||'');
   if (!validarBancoObrigatorio(pago, banco)) return;
   if (!validarSubcategoria('edit-catdre','edit-subcat')) return;
@@ -5437,6 +5456,7 @@ async function updateLancamento() {
   l.parcelas = parseInt(document.getElementById('edit-parcelas').value)||1;
   l.financeiro = document.getElementById('edit-financeiro').value;
   l.pago = pago;
+  l.dtpago = pago === 'sim' ? dtpagoEdit : '';
   l.obs = document.getElementById('edit-obs').value;
   l.tipo_pag = document.getElementById('edit-tipo-pag') ? document.getElementById('edit-tipo-pag').value : (l.tipo_pag||'');
   l.banco    = banco;
@@ -5449,7 +5469,7 @@ async function updateLancamento() {
     dtcompra: l.dtcompra, dtprev: l.dtprev, nf: l.nf,
     forn: l.forn, prod: l.prod, valor: l.valor,
     parcelas: l.parcelas, financeiro: l.financeiro,
-    pago: l.pago, tipo_pag: l.tipo_pag, banco: l.banco, obs: l.obs,
+    pago: l.pago, dtpago: l.dtpago, tipo_pag: l.tipo_pag, banco: l.banco, obs: l.obs,
     cat_dre: l.cat_dre,
     subcat: l.subcat,
     parcela_datas: l.parcela_datas
@@ -8927,6 +8947,8 @@ function editLancReceber(id) {
   document.getElementById('elr-parcelas').value=l.parcelas;
   document.getElementById('elr-financeiro').value=l.financeiro;
   document.getElementById('elr-recebido').value=l.recebido;
+  document.getElementById('elr-dtrecebido').value=l.dtrecebido||'';
+  toggleDataEdicao('elr-recebido','elr-dtrecebido-wrap','elr-dtrecebido');
   document.getElementById('elr-obs').value=l.obs||'';
   document.getElementById('elr-juros').value=l.juros||'';
   const elrBanco = document.getElementById('elr-banco');
@@ -8956,6 +8978,8 @@ async function updateLancReceber() {
   const id=document.getElementById('edit-lr-id').value;
   const l=db.lancreceber.find(x=>x.id===id); if(!l) return;
   const recebido=document.getElementById('elr-recebido').value;
+  const dtrecebidoEdit=document.getElementById('elr-dtrecebido').value;
+  if (recebido === 'sim' && !dtrecebidoEdit) { alert('Informe a data de recebimento.'); return; }
   const banco = document.getElementById('elr-banco') ? document.getElementById('elr-banco').value : (l.banco||'');
   if (!validarBancoObrigatorio(recebido, banco)) return;
   const _empLR = empresaDoForm('elr-empresa');
@@ -8970,13 +8994,14 @@ async function updateLancReceber() {
   l.parcelas=parseInt(document.getElementById('elr-parcelas').value)||1;
   l.financeiro=document.getElementById('elr-financeiro').value;
   l.recebido=recebido;
+  l.dtrecebido = recebido === 'sim' ? dtrecebidoEdit : '';
   l.banco=banco;
   l.juros=parseFloat(document.getElementById('elr-juros').value)||null;
   l.obs=document.getElementById('elr-obs').value;
   l.cat_dre = document.getElementById('elr-catdre') ? document.getElementById('elr-catdre').value : (l.cat_dre||'');
   const manualDates = l.parcelas > 1 ? getManualParcelaDates('elr-parcela-dates', l.parcelas) : null;
   l.parcela_datas = l.parcelas > 1 ? buildParcelaDatasPayload('elr-parcela-dates', l.parcelas) : null;
-  await sbFetch('lancreceber','PATCH',{empresa_id:l.empresa_id,dtvenda:l.dtvenda,dtprev:l.dtprev,nf:l.nf,cliente:l.cliente,prod:l.prod,valor:l.valor,parcelas:l.parcelas,financeiro:l.financeiro,recebido:l.recebido,banco:l.banco,obs:l.obs,cat_dre:l.cat_dre,parcela_datas:l.parcela_datas},`?id=eq.${id}`);
+  await sbFetch('lancreceber','PATCH',{empresa_id:l.empresa_id,dtvenda:l.dtvenda,dtprev:l.dtprev,nf:l.nf,cliente:l.cliente,prod:l.prod,valor:l.valor,parcelas:l.parcelas,financeiro:l.financeiro,recebido:l.recebido,dtrecebido:l.dtrecebido,banco:l.banco,obs:l.obs,cat_dre:l.cat_dre,parcela_datas:l.parcela_datas},`?id=eq.${id}`);
   closeModal('modal-lancreceber'); renderLancReceber();
 }
 async function deleteLancReceber(id) {
