@@ -1062,6 +1062,15 @@ body.menu-oculto .sidebar { transform:translateX(-248px); }
 
 .cxb-chq { font-size:11px; font-weight:600; color:#ea580c; margin-top:3px; }
 .cxb-ic.chq:hover { background:#ea580c; border-color:#ea580c; }
+/* ── Backup ── */
+.bk-grid > .card { margin-bottom:20px; }
+.bk-pasta-nome { font-size:15px; font-weight:700; color:#1f2937; display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+.bk-nota { font-size:12px; color:#57534e; margin-top:4px; line-height:1.5; }
+.bk-check { display:flex !important; align-items:center; gap:8px; font-size:13px; font-weight:500; color:#1f2937; margin-top:14px; cursor:pointer; }
+.bk-check input { width:auto !important; margin:0; padding:0; accent-color:#ea580c; }
+.bk-linha { display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; }
+.bk-linha .form-group { margin-bottom:0; }
+@media (max-width: 900px) { .bk-grid { grid-template-columns:1fr; } }
 </style>
 <style>
 /* =====================================================================
@@ -1391,6 +1400,10 @@ body.menu-oculto .sidebar { transform:translateX(-248px); }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Gestão de Usuários
       </div>
+      <div class="nav-item" id="nav-backup" onclick="showPage('backup')" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Backup
+      </div>
     </nav>
     <div class="sidebar-footer">
       <div class="sf-card">
@@ -1503,6 +1516,7 @@ body.menu-oculto .sidebar { transform:translateX(-248px); }
         <div><div class="page-title">Lançamentos — Contas a Pagar</div><div class="page-sub" style="margin-bottom:0">Registro de compras de produtos</div></div>
         <button class="btn-pdf" onclick="imprimirPagina('lancamentos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> PDF</button>
         <button class="btn btn-secondary" onclick="abrirModalCategoriaMassa('lancamentos')">🏷️ Categoria em Massa</button>
+        <button class="btn btn-secondary" onclick="nfeEscolherArquivo()" title="Importa o XML da NF-e de compra e preenche o lançamento">🧾 Importar XML NF-e</button>
         <button class="btn btn-secondary" onclick="abrirModalImport('pagar')">📥 Importar Extrato</button>
         <button class="btn-novo" id="btn-novo-lanc" onclick="abrirModalLanc()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo
@@ -1571,7 +1585,7 @@ body.menu-oculto .sidebar { transform:translateX(-248px); }
 
     <!-- ══ A PAGAR ══ -->
     <div class="page" id="page-apagar">
-      <div class="page-header"><div><div class="page-title">Contas a Pagar</div><div class="page-sub" style="margin-bottom:0">Parcelas em aberto e próximas do vencimento</div></div><div style="display:flex;gap:8px"><button class="btn-pdf" onclick="abrirPdfDia('apagar')" style="background:#0f766e">📅 PDF por Dia</button><button class="btn-pdf" onclick="imprimirPagina('apagar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> PDF</button></div></div>
+      <div class="page-header"><div><div class="page-title">Contas a Pagar</div><div class="page-sub" style="margin-bottom:0">Parcelas em aberto e próximas do vencimento</div></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" onclick="nfeEscolherArquivo()" title="Importa o XML da NF-e de compra e preenche o lançamento">🧾 Importar XML NF-e</button><button class="btn-pdf" onclick="abrirPdfDia('apagar')" style="background:#0f766e">📅 PDF por Dia</button><button class="btn-pdf" onclick="imprimirPagina('apagar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> PDF</button></div></div>
       <div id="apagar-kpis" class="grid4" style="margin-bottom:20px;"></div>
       <div class="card">
         <div class="card-title">Filtros</div>
@@ -1752,6 +1766,60 @@ body.menu-oculto .sidebar { transform:translateX(-248px); }
         <div id="login-log-list">
           <div class="empty-state" style="padding:24px">Nenhum acesso registrado ainda nesta sessão.</div>
         </div>
+      </div>
+    </div>
+
+
+    <!-- ══ BACKUP ══ -->
+    <div class="page" id="page-backup">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Backup <span class="admin-only-badge">🔒 Admin</span></div>
+          <div class="page-sub" style="margin-bottom:0">Cópia de segurança dos dados em arquivo .json — escolha a pasta, o período e a frequência do backup automático.</div>
+        </div>
+      </div>
+
+      <div class="grid2 bk-grid">
+        <div class="card">
+          <div class="card-title">Pasta de destino</div>
+          <div id="bk-pasta-info"></div>
+          <div class="btn-row" style="margin-top:14px">
+            <button class="btn btn-primary" id="bk-btn-pasta" onclick="backupEscolherPasta()">📁 Escolher pasta</button>
+            <button class="btn btn-secondary" id="bk-btn-rem-pasta" style="display:none" onclick="backupRemoverPasta()">Usar Downloads</button>
+          </div>
+          <label class="bk-check"><input type="checkbox" id="bk-subpasta" onchange="backupSalvarConfig()" /> Criar uma subpasta por mês (ex.: 2026-11)</label>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Backup automático <span id="bk-cfg-msg" style="text-transform:none;letter-spacing:0;font-weight:600;margin-left:6px"></span></div>
+          <label class="bk-check" style="margin:0 0 14px"><input type="checkbox" id="bk-auto" onchange="backupSalvarConfig()" /> Fazer backup automaticamente</label>
+          <div class="grid2" style="gap:14px">
+            <div class="form-group"><label>Frequência</label><select id="bk-freq" onchange="backupSalvarConfig()"></select></div>
+            <div class="form-group"><label>Período dos dados</label><select id="bk-auto-periodo" onchange="backupSalvarConfig()"></select></div>
+          </div>
+          <div class="bk-nota" id="bk-auto-info"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Gerar backup agora</div>
+        <div class="bk-linha">
+          <div class="form-group" style="min-width:220px"><label>Período</label><select id="bk-periodo" onchange="backupAtualizarCamposPeriodo()"></select></div>
+          <div id="bk-datas" style="display:none;gap:12px" class="bk-linha">
+            <div class="form-group"><label>De</label><input type="date" id="bk-de" /></div>
+            <div class="form-group"><label>Até</label><input type="date" id="bk-ate" /></div>
+          </div>
+          <div class="form-group"><button class="btn btn-primary" id="bk-btn-gerar" onclick="backupGerarAgora()">💾 Gerar backup</button></div>
+        </div>
+        <div class="bk-nota" id="bk-periodo-prev"></div>
+        <div class="bk-nota">Cadastros (fornecedores, clientes, bancos, categorias, configurações…) vão sempre completos; movimentações são filtradas pela data do lançamento.</div>
+        <div class="bk-nota" style="color:#a8a29e">Tabelas incluídas: <span id="bk-tabelas"></span></div>
+        <div id="bk-status" style="margin-top:12px;font-size:13px"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Histórico de backups</div>
+        <div id="bk-historico"></div>
       </div>
     </div>
 
@@ -3004,8 +3072,11 @@ body.menu-oculto .sidebar { transform:translateX(-248px); }
   <div class="modal modal-compacto" style="width:720px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
       <div class="modal-title" style="margin-bottom:0;">📦 Novo Lançamento — Pagamento</div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="nfeEscolherArquivo()" style="margin-left:auto;margin-right:8px" title="Preencher a partir do XML da NF-e (ou arraste o arquivo .xml para esta janela)">🧾 Importar XML NF-e</button>
       <button onclick="fecharModalLanc()" style="background:none;border:none;cursor:pointer;color:#a8a29e;font-size:22px;line-height:1;padding:4px;" title="Fechar">✕</button>
     </div>
+    <input type="file" id="nfe-xml-file" accept=".xml,text/xml,application/xml" multiple style="display:none" onchange="nfeLerArquivos(this.files)" />
+    <div id="l-nfe-info" style="display:none;margin-bottom:16px;padding:10px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-left:4px solid #2563eb;border-radius:8px;font-size:12.5px;color:#1e3a8a;line-height:1.5"></div>
     <div class="grid3">
       <div class="form-group" style="display:none"><label>Empresa *</label><select id="l-empresa" class="sel-empresa"><option value="">Selecione...</option></select></div>
     </div>
@@ -4821,7 +4892,7 @@ function _finalizarLogin(found) {
   if (sll) sll.textContent = prev ? 'Último acesso: ' + fmtTs(prev.ts) : 'Primeiro acesso';
   // Mostrar/ocultar nav admin
   const isAdmin = found.role === 'admin';
-  ['nav-label-admin','nav-item-usuarios'].forEach(id => {
+  ['nav-label-admin','nav-item-usuarios','nav-backup'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = isAdmin ? '' : 'none';
   });
@@ -4880,7 +4951,8 @@ let _paginaAtual = 'dashboard';
 
 function showPage(p) {
   // Verificar permissão (exceto admin e páginas de administração)
-  if (p !== 'usuarios' && p !== 'empresas' && currentUser && currentUser.role !== 'admin') {
+  if (p === 'backup' && currentUser && currentUser.role !== 'admin') { alert('Acesso não permitido para seu perfil.'); return; }
+  if (p !== 'usuarios' && p !== 'empresas' && p !== 'backup' && currentUser && currentUser.role !== 'admin') {
     const allowed = currentUser.pages || [];
     if (!allowed.includes(p)) { alert('Acesso não permitido para seu perfil.'); return; }
   }
@@ -4919,6 +4991,7 @@ function showPage(p) {
   if (p === 'dre-analise-subcat'){ popularCategoriasAnaliseSub(); renderAnaliseSubcategoria(); }
   if (p === 'metas-categoria')   { carregarMetasCategoria().then(abrirMetasCategoria); }
   if (p === 'usuarios')          renderUsuariosAdmin();
+  if (p === 'backup')            renderBackupPage();
   if (p === 'empresas')          renderEmpresas();
 }
 
@@ -4959,6 +5032,7 @@ function renderPaginaAtual() {
   if (p === 'dre-analise-subcat'){ popularCategoriasAnaliseSub(); renderAnaliseSubcategoria(); }
   if (p === 'metas-categoria')   { carregarMetasCategoria().then(abrirMetasCategoria); }
   if (p === 'usuarios')          renderUsuariosAdmin();
+  if (p === 'backup')            renderBackupPage();
   if (p === 'empresas')          renderEmpresas();
 }
 
@@ -5041,7 +5115,7 @@ function abrirModalLanc() {
 }
 // Fecha SEMPRE limpando os campos — evita que dados de um lançamento
 // anterior fiquem na tela ao reabrir (bug do item 4).
-function fecharModalLanc() { clearLancamento(); closeModal('modal-novo-lanc'); }
+function fecharModalLanc() { clearLancamento(); closeModal('modal-novo-lanc'); _nfeAoCancelar(); }
 
 function abrirModalLancReceber() {
   populateClienteSelects();
@@ -6159,6 +6233,7 @@ async function saveLancamento() {
   if(!rL) { alert('❌ Erro ao salvar lançamento.' + sbErroDetalhe()); return; }
   db.lancamentos.push(lanc);
   clearLancamento(); closeModal('modal-novo-lanc'); renderLancamentos(); renderApagar(); renderPagas(); populateYearSelects();
+  _nfeAposSalvar();
 }
 
 function clearLancamento() {
@@ -6189,7 +6264,463 @@ function clearLancamento() {
   const parcelasEl = document.getElementById('l-parcelas');
   if (parcelasEl) parcelasEl.disabled = false;
   toggleContaFixaVigencia();
+  _nfeLimparInfo();
 }
+// ══════════════════════════════════════════════════════════════════
+// IMPORTAR XML DA NF-e → LANÇAMENTO DE CONTAS A PAGAR
+// Lê o XML (nfeProc ou NFe, modelo 55/65), localiza ou cadastra o
+// fornecedor pelo CNPJ/CPF do emitente e abre o "Novo Lançamento —
+// Pagamento" já preenchido: data de emissão, nº da NF, valor, parcelas
+// (duplicatas com vencimento e valor), previsão de pagamento, forma de
+// pagamento, item, categoria sugerida e observações com chave de acesso
+// e itens da nota. Nada é gravado em lançamentos até o usuário clicar
+// em "Salvar Lançamento". Aceita vários arquivos: ao salvar um, abre o
+// próximo da fila. Também dá para arrastar o .xml para dentro do modal.
+// ══════════════════════════════════════════════════════════════════
+var _nfeFila = [];
+var _nfeAtual = null;
+
+// Códigos tPag da NF-e → formas de pagamento do sistema
+const NFE_TPAG = {
+  '01': 'Dinheiro', '02': 'Cheque', '03': 'Cartão de Crédito', '04': 'Cartão de Débito',
+  '05': 'Crédito Loja', '10': 'Vale Alimentação', '11': 'Vale Refeição', '12': 'Vale Presente',
+  '13': 'Vale Combustível', '15': 'Boleto', '16': 'Transferência', '17': 'PIX',
+  '18': 'Transferência', '19': 'Programa de fidelidade', '20': 'PIX', '90': '', '99': ''
+};
+
+function nfeEscolherArquivo() {
+  const inp = document.getElementById('nfe-xml-file');
+  if (!inp) return;
+  inp.value = '';
+  inp.click();
+}
+
+function _nfeAcharNome(lista, nome) {
+  const n = normText(nome);
+  return n ? ((lista || []).find(x => normText(x.nome) === n) || null) : null;
+}
+function _nfeSoDigitos(s) { return (s || '').toString().replace(/\D/g, ''); }
+function _nfeFmtDoc(d) {
+  d = _nfeSoDigitos(d);
+  if (d.length === 14) return d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+  if (d.length === 11) return d.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+  return d;
+}
+function _nfeFmtFone(f) {
+  f = _nfeSoDigitos(f);
+  if (f.length === 10) return f.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+  if (f.length === 11) return f.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+  return f;
+}
+function _nfeEsc(s) {
+  return (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function _nfeNum(v) { const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function _nfeR2(v) { return Math.round((v || 0) * 100) / 100; }
+function _nfeData(s) { return (s || '').toString().slice(0, 10); } // "2026-11-23T11:24:00-03:00" → "2026-11-23"
+function _nfeDataBR(iso) { if (!iso) return ''; const [a, m, d] = iso.split('-'); return `${d}/${m}/${a}`; }
+
+// Lê o arquivo respeitando o encoding declarado no XML (UTF-8 ou ISO-8859-1)
+function _nfeLerTexto(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onerror = () => reject(fr.error);
+    fr.onload = () => {
+      const buf = fr.result;
+      const cabeca = new TextDecoder('latin1').decode(new Uint8Array(buf, 0, Math.min(200, buf.byteLength)));
+      const m = cabeca.match(/encoding=["']([\w-]+)["']/i);
+      let enc = m ? m[1].toLowerCase() : 'utf-8';
+      try { resolve(new TextDecoder(enc).decode(buf)); }
+      catch (e) { resolve(new TextDecoder('utf-8').decode(buf)); }
+    };
+    fr.readAsArrayBuffer(file);
+  });
+}
+
+// Converte o XML em um objeto simples com tudo o que o lançamento precisa
+function nfeParseXml(texto) {
+  const doc = new DOMParser().parseFromString(texto.replace(/^﻿/, ''), 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error('O arquivo não é um XML válido.');
+  const um = (pai, tag) => pai ? pai.getElementsByTagNameNS('*', tag)[0] || null : null;
+  const todos = (pai, tag) => pai ? Array.from(pai.getElementsByTagNameNS('*', tag)) : [];
+  // Texto de um filho DIRETO (evita pegar, p.ex., o CNPJ do autXML no lugar do emitente)
+  const filho = (pai, tag) => {
+    if (!pai) return '';
+    for (const c of pai.children) if (c.localName === tag) return (c.textContent || '').trim();
+    return '';
+  };
+  const txt = (pai, tag) => { const e = um(pai, tag); return e ? (e.textContent || '').trim() : ''; };
+
+  const inf = um(doc, 'infNFe');
+  if (!inf) {
+    if (um(doc, 'infCte')) throw new Error('Este XML é de um CT-e (conhecimento de transporte), não de uma NF-e.');
+    if (um(doc, 'infNFSe') || um(doc, 'CompNfse') || um(doc, 'Nfse')) throw new Error('Este XML é de uma NFS-e (nota de serviço). Somente NF-e/NFC-e são aceitas aqui.');
+    throw new Error('Não encontrei os dados de uma NF-e neste XML (grupo infNFe).');
+  }
+  const ide = um(inf, 'ide'), emit = um(inf, 'emit'), dest = um(inf, 'dest');
+  const enderEmit = um(emit, 'enderEmit');
+  const tot = um(inf, 'ICMSTot');
+  const prot = um(doc, 'infProt');
+
+  const chave = (_nfeSoDigitos(inf.getAttribute('Id')) || txt(prot, 'chNFe')).slice(-44);
+  const itens = todos(inf, 'det').map(det => {
+    const prod = um(det, 'prod');
+    return {
+      n: det.getAttribute('nItem'),
+      cod: filho(prod, 'cProd'), nome: filho(prod, 'xProd'), ncm: filho(prod, 'NCM'), cfop: filho(prod, 'CFOP'),
+      un: filho(prod, 'uCom'), qtd: _nfeNum(filho(prod, 'qCom')), vun: _nfeNum(filho(prod, 'vUnCom')),
+      valor: _nfeNum(filho(prod, 'vProd'))
+    };
+  });
+  const dups = todos(inf, 'dup').map(d => ({ n: filho(d, 'nDup'), venc: _nfeData(filho(d, 'dVenc')), valor: _nfeNum(filho(d, 'vDup')) }));
+  const pags = todos(inf, 'detPag').map(p => ({ tPag: filho(p, 'tPag'), xPag: filho(p, 'xPag'), valor: _nfeNum(filho(p, 'vPag')), ind: filho(p, 'indPag') }));
+  const fat = um(inf, 'fat');
+  const transp = um(inf, 'transp');
+  const vTot = (tag) => _nfeNum(filho(tot, tag));
+
+  return {
+    chave,
+    modelo: filho(ide, 'mod'),
+    numero: filho(ide, 'nNF'),
+    serie: filho(ide, 'serie'),
+    natOp: filho(ide, 'natOp'),
+    tpNF: filho(ide, 'tpNF'),            // 0 = entrada, 1 = saída
+    finNFe: filho(ide, 'finNFe'),        // 1 normal, 2 compl., 3 ajuste, 4 devolução
+    tpAmb: filho(ide, 'tpAmb'),          // 1 produção, 2 homologação
+    emissao: _nfeData(filho(ide, 'dhEmi') || filho(ide, 'dEmi')),
+    emit: {
+      doc: filho(emit, 'CNPJ') || filho(emit, 'CPF'),
+      nome: filho(emit, 'xNome'), fantasia: filho(emit, 'xFant'), ie: filho(emit, 'IE'),
+      fone: filho(enderEmit, 'fone'),
+      endereco: enderEmit ? [filho(enderEmit, 'xLgr') + (filho(enderEmit, 'nro') ? ', ' + filho(enderEmit, 'nro') : ''),
+        filho(enderEmit, 'xBairro'), filho(enderEmit, 'xMun') + (filho(enderEmit, 'UF') ? '/' + filho(enderEmit, 'UF') : ''),
+        filho(enderEmit, 'CEP') ? 'CEP ' + filho(enderEmit, 'CEP') : ''].filter(Boolean).join(' - ') : '',
+      email: filho(emit, 'email')
+    },
+    dest: { doc: filho(dest, 'CNPJ') || filho(dest, 'CPF'), nome: filho(dest, 'xNome') },
+    itens, dups, pags,
+    fatLiq: fat ? _nfeNum(filho(fat, 'vLiq')) : 0,
+    total: {
+      nf: vTot('vNF'), prod: vTot('vProd'), frete: vTot('vFrete'), seguro: vTot('vSeg'),
+      desc: vTot('vDesc'), outros: vTot('vOutro'), ipi: vTot('vIPI'), st: vTot('vST')
+    },
+    transportadora: transp ? txt(um(transp, 'transporta'), 'xNome') : '',
+    pesoB: transp ? _nfeNum(txt(transp, 'pesoB')) : 0,
+    infCpl: txt(um(inf, 'infAdic'), 'infCpl'),
+    prot: prot ? { cStat: filho(prot, 'cStat'), motivo: filho(prot, 'xMotivo'), nProt: filho(prot, 'nProt') } : null
+  };
+}
+
+async function nfeLerArquivos(files) {
+  const lista = Array.from(files || []).filter(f => /\.xml$/i.test(f.name) || /xml/.test(f.type));
+  if (!lista.length) { if (files && files.length) alert('Selecione arquivo(s) .xml de NF-e.'); return; }
+  const lidas = [], erros = [];
+  for (const f of lista) {
+    try { const nfe = nfeParseXml(await _nfeLerTexto(f)); nfe.arquivo = f.name; lidas.push(nfe); }
+    catch (e) { erros.push(`• ${f.name}: ${e.message}`); }
+  }
+  const inp = document.getElementById('nfe-xml-file'); if (inp) inp.value = '';
+  if (erros.length) alert('⚠️ Não foi possível ler ' + (erros.length === 1 ? 'o arquivo' : erros.length + ' arquivos') + ':\n\n' + erros.join('\n'));
+  if (!lidas.length) return;
+  const vistas = new Set(), repetidas = [];
+  const unicas = lidas.filter(n => {
+    const k = n.chave || (n.emit.doc + '|' + n.numero);
+    if (vistas.has(k)) { repetidas.push(`• ${n.arquivo} (NF-e ${n.numero})`); return false; }
+    vistas.add(k); return true;
+  });
+  if (repetidas.length) alert('⛔ Arquivo(s) repetido(s) na seleção — a mesma nota não pode ser incluída duas vezes:\n\n' + repetidas.join('\n'));
+  _nfeFila = unicas;
+  await _nfeProxima();
+}
+
+async function _nfeProxima() {
+  while (_nfeFila.length) {
+    const nfe = _nfeFila.shift();
+    const ok = await nfePreencherLancamento(nfe);
+    if (ok) return;   // modal aberto com esta nota; a próxima vem depois de salvar
+  }
+}
+
+// Chamado depois que um lançamento é salvo com sucesso
+function _nfeAposSalvar() {
+  if (_nfeFila.length) setTimeout(() => _nfeProxima(), 150);
+}
+
+function _nfeLimparInfo() {
+  _nfeAtual = null;
+  const box = document.getElementById('l-nfe-info');
+  if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+}
+
+// Procura lançamento já gravado desta mesma nota
+function _nfeAcharDuplicado(nfe, fornId) {
+  const numNorm = String(nfe.numero || '').replace(/^0+/, '');
+  return (db.lancamentos || []).find(l =>
+    (nfe.chave && (l.obs || '').indexOf(nfe.chave) > -1) ||
+    (fornId && l.forn === fornId && numNorm && String(l.nf || '').replace(/\D/g, '').replace(/^0+/, '') === numNorm)
+  ) || null;
+}
+
+// Confere duplicidade também no banco: a memória só tem os lançamentos da
+// empresa ativa, e outra pessoa pode ter lançado a nota em outro computador.
+async function _nfeAcharDuplicadoTodos(nfe, fornId) {
+  const local = _nfeAcharDuplicado(nfe, fornId);
+  if (local) return local;
+  const campos = 'select=id,dtcompra,valor,nf,forn,obs,empresa_id';
+  try {
+    if (nfe.chave) {
+      const r = await sbFetch('lancamentos', 'GET', null, `?${campos}&obs=ilike.*${nfe.chave}*&limit=1`);
+      if (Array.isArray(r) && r.length) return r[0];
+    }
+    const numNorm = String(nfe.numero || '').replace(/^0+/, '');
+    if (fornId && numNorm) {
+      const r = await sbFetch('lancamentos', 'GET', null, `?${campos}&forn=eq.${encodeURIComponent(fornId)}`);
+      if (Array.isArray(r)) {
+        const achou = r.find(l => String(l.nf || '').replace(/\D/g, '').replace(/^0+/, '') === numNorm);
+        if (achou) return achou;
+      }
+    }
+  } catch (e) { console.warn('Conferência de NF-e duplicada no banco falhou:', e); }
+  return null;
+}
+
+// Localiza o fornecedor pelo CNPJ/CPF (ou nome); se não existir, cadastra com os dados do emitente
+async function _nfeGarantirFornecedor(emit, infos) {
+  const doc = _nfeSoDigitos(emit.doc);
+  let f = doc ? (db.fornecedores || []).find(x => _nfeSoDigitos(x.cnpj) === doc) : null;
+  if (f) return f.id;
+  f = _nfeAcharNome(db.fornecedores, emit.nome) || (emit.fantasia ? _nfeAcharNome(db.fornecedores, emit.fantasia) : null);
+  if (f) {
+    // Completa o CNPJ (e telefone) que faltava no cadastro existente
+    if (!_nfeSoDigitos(f.cnpj) && doc) {
+      const patch = { cnpj: _nfeFmtDoc(doc) };
+      if (!f.tel && emit.fone) patch.tel = _nfeFmtFone(emit.fone);
+      const ok = await sbFetch('fornecedores', 'PATCH', patch, `?id=eq.${f.id}`);
+      if (ok) { Object.assign(f, patch); infos.push(`CNPJ ${patch.cnpj} adicionado ao cadastro do fornecedor "${f.nome}".`); }
+    }
+    return f.id;
+  }
+  const novo = {
+    id: uid(),
+    nome: emit.nome || emit.fantasia || ('Fornecedor ' + _nfeFmtDoc(doc)),
+    cnpj: _nfeFmtDoc(doc),
+    contato: '',
+    tel: _nfeFmtFone(emit.fone),
+    email: emit.email || '',
+    cat: '',
+    obs: [emit.fantasia && emit.fantasia !== emit.nome ? 'Fantasia: ' + emit.fantasia : '',
+          emit.ie ? 'IE: ' + emit.ie : '', emit.endereco].filter(Boolean).join(' | ') + ' [cadastrado via XML NF-e]'
+  };
+  const ok = await sbFetch('fornecedores', 'POST', novo);
+  if (!ok) { alert('❌ Não foi possível cadastrar o fornecedor "' + novo.nome + '".' + sbErroDetalhe()); return ''; }
+  db.fornecedores.push(novo);
+  if (typeof bumpDbVer === 'function') bumpDbVer();
+  if (typeof renderFornecedores === 'function') { try { renderFornecedores(); } catch (e) {} }
+  infos.push(`Fornecedor "${novo.nome}" (${novo.cnpj}) cadastrado automaticamente.`);
+  return novo.id;
+}
+
+// Item do cadastro que corresponde à nota (código do fornecedor ou nome)
+function _nfeAcharProduto(nfe, fornId) {
+  if (!nfe.itens.length || !(db.produtos || []).length) return null;
+  const achar = (it) => {
+    const porCod = it.cod ? db.produtos.filter(p => p.sku && String(p.sku).trim() === it.cod) : [];
+    return porCod.find(p => p.forn === fornId) || porCod.find(p => !p.forn) || _nfeAcharNome(db.produtos, it.nome) || null;
+  };
+  const ordenados = [...nfe.itens].sort((a, b) => b.valor - a.valor); // item principal = maior valor
+  for (const it of ordenados) { const p = achar(it); if (p) return p; }
+  return null;
+}
+
+function _nfeSetSelect(id, valor) {
+  const el = document.getElementById(id);
+  if (!el || valor == null || valor === '') return false;
+  if (![...el.options].some(o => o.value === valor)) return false;
+  el.value = valor;
+  return true;
+}
+
+function _nfeMontarObs(nfe) {
+  const L = [];
+  L.push(`NF-e ${nfe.numero}${nfe.serie ? ' série ' + nfe.serie : ''} — emissão ${_nfeDataBR(nfe.emissao)} — ${nfe.natOp}`);
+  L.push(`Chave: ${nfe.chave}`);
+  L.push(`Emitente: ${nfe.emit.nome} — ${_nfeFmtDoc(nfe.emit.doc)}`);
+  if (nfe.itens.length) {
+    L.push('Itens:');
+    const max = 15;
+    nfe.itens.slice(0, max).forEach(it => {
+      const q = it.qtd.toLocaleString('pt-BR', { maximumFractionDigits: 4 });
+      const vu = it.vun.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+      L.push(` ${it.n}) ${it.nome} — ${q} ${it.un} x R$ ${vu} = ${fmtBRL(it.valor)}`);
+    });
+    if (nfe.itens.length > max) L.push(` … e mais ${nfe.itens.length - max} item(ns)`);
+  }
+  const t = nfe.total, extras = [];
+  if (t.frete) extras.push('Frete ' + fmtBRL(t.frete));
+  if (t.seguro) extras.push('Seguro ' + fmtBRL(t.seguro));
+  if (t.ipi) extras.push('IPI ' + fmtBRL(t.ipi));
+  if (t.st) extras.push('ICMS-ST ' + fmtBRL(t.st));
+  if (t.outros) extras.push('Outras desp. ' + fmtBRL(t.outros));
+  if (t.desc) extras.push('Desconto ' + fmtBRL(t.desc));
+  if (extras.length) L.push('Produtos ' + fmtBRL(t.prod) + ' | ' + extras.join(' | ') + ' | Total NF ' + fmtBRL(t.nf));
+  if (nfe.pags.length) {
+    const formas = nfe.pags.map(p => (p.tPag === '90' ? 'Sem pagamento' : (NFE_TPAG[p.tPag] || p.xPag || ('Outros (' + p.tPag + ')'))) + ' ' + fmtBRL(p.valor));
+    L.push('Pagamento na NF: ' + formas.join(' + '));
+  }
+  if (nfe.prot && nfe.prot.nProt) L.push(`Protocolo: ${nfe.prot.nProt}`);
+  return L.join('\n');
+}
+
+// Abre o modal de novo lançamento preenchido com a nota. Retorna true se abriu.
+async function nfePreencherLancamento(nfe) {
+  const avisos = [], alertas = [], infos = [];
+
+  // ── Conferências da nota ──
+  if (nfe.modelo && nfe.modelo !== '55' && nfe.modelo !== '65') alertas.push(`Modelo de documento ${nfe.modelo} (esperado 55 — NF-e).`);
+  if (!nfe.prot) alertas.push('XML sem protocolo de autorização da SEFAZ (não é o XML "procNFe" autorizado).');
+  else if (nfe.prot.cStat && !['100', '150'].includes(nfe.prot.cStat)) alertas.push(`Situação na SEFAZ: ${nfe.prot.cStat} — ${nfe.prot.motivo}.`);
+  if (nfe.tpAmb === '2') alertas.push('Nota emitida em HOMOLOGAÇÃO (ambiente de testes), sem valor fiscal.');
+  if (nfe.finNFe === '4') alertas.push('Nota de DEVOLUÇÃO.');
+  if (nfe.finNFe === '2' || nfe.finNFe === '3') alertas.push('Nota complementar/de ajuste.');
+  const emp = (db.empresas || [])[0];
+  const docEmp = emp ? _nfeSoDigitos(emp.cnpj) : '';
+  if (docEmp && _nfeSoDigitos(nfe.emit.doc) === docEmp) alertas.push('O EMITENTE desta nota é a própria empresa — parece uma nota de venda/saída, não uma compra.');
+  else if (docEmp && nfe.dest.doc && _nfeSoDigitos(nfe.dest.doc) !== docEmp) alertas.push(`Destinatário da nota é ${nfe.dest.nome} (${_nfeFmtDoc(nfe.dest.doc)}), diferente do CNPJ da empresa.`);
+
+  if (alertas.length && !confirm(`⚠️ NF-e ${nfe.numero} — ${nfe.emit.nome}\n\n• ${alertas.join('\n• ')}\n\nDeseja importar mesmo assim?`)) return false;
+
+  // Duplicidade (antes de cadastrar qualquer coisa)
+  const docEmit = _nfeSoDigitos(nfe.emit.doc);
+  const fornExist = (docEmit ? (db.fornecedores || []).find(x => _nfeSoDigitos(x.cnpj) === docEmit) : null)
+    || (db.fornecedores || []).find(x => normText(x.nome) && normText(x.nome) === normText(nfe.emit.nome)) || null;
+  const dup = await _nfeAcharDuplicadoTodos(nfe, fornExist ? fornExist.id : '');
+  if (dup) {
+    const emp = (dup.empresa_id && typeof empresaNome === 'function') ? ' — empresa ' + empresaNome(dup.empresa_id) : '';
+    alert(`⛔ A NF-e ${nfe.numero} de ${nfe.emit.nome} já está lançada e não pode ser incluída novamente.\n\n` +
+      `Lançamento existente: ${_nfeDataBR(dup.dtcompra)} — ${fmtBRL(dup.valor)}${dup.nf ? ' — NF ' + dup.nf : ''}${emp}\n\n` +
+      `Se precisar lançar de novo, exclua primeiro o lançamento existente.`);
+    return false;
+  }
+
+  const fornId = await _nfeGarantirFornecedor(nfe.emit, infos);
+
+  // ── Valor e parcelas ──
+  let dups = nfe.dups.filter(d => d.valor > 0);
+  const somaDups = _nfeR2(dups.reduce((a, d) => a + d.valor, 0));
+  let valor = nfe.total.nf || nfe.fatLiq || somaDups;
+  if (dups.length && Math.abs(somaDups - valor) >= 0.01) {
+    avisos.push(`Soma das duplicatas (${fmtBRL(somaDups)}) difere do total da NF (${fmtBRL(valor)}); usado o valor das duplicatas.`);
+    valor = somaDups;
+  }
+  if (dups.length > 36) { avisos.push(`A nota tem ${dups.length} duplicatas; o sistema aceita até 36 — confira as parcelas.`); dups = dups.slice(0, 36); }
+  dups.sort((a, b) => (a.venc || '').localeCompare(b.venc || ''));
+
+  // ── Abre o modal limpo e preenche ──
+  clearLancamento();
+  abrirModalLanc();
+  if (typeof populateEmpresaSelects === 'function') populateEmpresaSelects();
+  // Empresa: a ativa; sem empresa ativa, a do CNPJ destinatário (ou a única cadastrada)
+  const selEmp = document.getElementById('l-empresa');
+  if (selEmp && !selEmp.value && !(typeof empresaAtual === 'function' && empresaAtual())) {
+    const ativas = (typeof empresasAtivas === 'function' ? empresasAtivas() : (db.empresas || []));
+    const docDest = _nfeSoDigitos(nfe.dest.doc);
+    const e = ativas.find(x => docDest && _nfeSoDigitos(x.cnpj) === docDest) || (ativas.length === 1 ? ativas[0] : null);
+    if (e) _nfeSetSelect('l-empresa', e.id);
+  }
+
+  document.getElementById('l-dtcompra').value = nfe.emissao || today();
+  document.getElementById('l-nf').value = nfe.numero || '';
+  document.getElementById('l-valor').value = _nfeR2(valor).toFixed(2);
+  if (fornId) _nfeSetSelect('l-forn', fornId);
+
+  const prevPag = dups.length ? dups[0].venc : (nfe.emissao || '');
+  document.getElementById('l-dtprev').value = prevPag;
+
+  // Item
+  const prod = _nfeAcharProduto(nfe, fornId);
+  if (prod) _nfeSetSelect('l-prod', prod.id);
+
+  // Categoria: a do item cadastrado; senão, a mais usada com o fornecedor ou palavra-chave
+  let cat = (prod && prod.cat) ? prod.cat : '';
+  if (!cat || !_nfeSetSelect('l-catdre', cat)) {
+    cat = sugerirCategoria('pagar', fornId, null, nfe.itens.map(i => i.nome).join(' ') + ' ' + nfe.natOp + ' ' + nfe.emit.nome);
+    _nfeSetSelect('l-catdre', cat);
+  }
+
+  // Forma de pagamento (a de maior valor na nota; ignora "90 - sem pagamento")
+  const pagsValidos = nfe.pags.filter(p => p.tPag && p.tPag !== '90').sort((a, b) => b.valor - a.valor);
+  let forma = pagsValidos.length ? (NFE_TPAG[pagsValidos[0].tPag] || pagsValidos[0].xPag || '') : '';
+  if (!forma && dups.length) forma = 'Boleto';
+  if (forma && !_nfeSetSelect('l-tipo-pag', forma)) {
+    const alvo = normText(forma);
+    const el = document.getElementById('l-tipo-pag');
+    const opt = el ? [...el.options].find(o => normText(o.value) === alvo) : null;
+    if (opt) el.value = opt.value;
+  }
+
+  // Parcelas (duplicatas)
+  const n = Math.max(1, dups.length);
+  document.getElementById('l-parcelas').value = String(n);
+  toggleParcelaDates('l-parcelas', 'l-parcela-dates');
+  if (n > 1) {
+    dups.forEach((d, i) => {
+      const elD = document.getElementById(`l-parcela-dates-p${i + 1}`);
+      const elV = document.getElementById(`l-parcela-dates-v${i + 1}`);
+      if (elD && d.venc) { elD.value = d.venc; elD.dataset.auto = ''; }
+      if (elV) { elV.value = _nfeR2(d.valor).toFixed(2); elV.dataset.auto = ''; }
+    });
+    syncTotalParcelaValores('l-parcela-dates', n, 'l-parcelas');
+  }
+
+  document.getElementById('l-obs').value = _nfeMontarObs(nfe);
+  _nfeAtual = nfe;
+
+  // ── Resumo no topo do modal ──
+  const box = document.getElementById('l-nfe-info');
+  if (box) {
+    const parcTxt = dups.length
+      ? dups.map((d, i) => `${i + 1}ª ${_nfeDataBR(d.venc)} ${fmtBRL(d.valor)}`).join(' · ')
+      : 'sem duplicatas (à vista) — vencimento = data de emissão';
+    box.innerHTML =
+      `<div style="font-weight:700;margin-bottom:2px">🧾 NF-e ${_nfeEsc(nfe.numero)}${nfe.serie ? ' / série ' + _nfeEsc(nfe.serie) : ''} — ${_nfeEsc(nfe.emit.nome)}</div>` +
+      `<div>Emissão ${_nfeDataBR(nfe.emissao)} · Total ${fmtBRL(nfe.total.nf)} · ${nfe.itens.length} item(ns)</div>` +
+      `<div>Parcelas: ${parcTxt}</div>` +
+      (infos.length ? `<div style="margin-top:6px">ℹ️ ${infos.map(_nfeEsc).join('<br>ℹ️ ')}</div>` : '') +
+      (avisos.length ? `<div style="margin-top:6px;color:#9a3412">⚠️ ${avisos.map(_nfeEsc).join('<br>⚠️ ')}</div>` : '') +
+      (_nfeFila.length ? `<div style="margin-top:6px;font-weight:600">📂 Mais ${_nfeFila.length} nota(s) na fila — abrem em seguida ao salvar.</div>` : '') +
+      `<div style="margin-top:6px;color:#475569">Confira os dados e clique em <b>Salvar Lançamento</b>.</div>`;
+    box.style.display = '';
+  }
+  return true;
+}
+
+// Cancelar com notas na fila: pergunta se segue para a próxima
+function _nfeAoCancelar() {
+  if (!_nfeFila.length) return;
+  if (confirm(`Ainda há ${_nfeFila.length} nota(s) na fila de importação.\n\nAbrir a próxima?`)) setTimeout(() => _nfeProxima(), 150);
+  else _nfeFila = [];
+}
+
+// Arrastar e soltar o XML dentro do modal de novo lançamento
+(function () {
+  const ligar = () => {
+    const ov = document.getElementById('modal-novo-lanc');
+    if (!ov || ov.dataset.nfeDrop) return;
+    ov.dataset.nfeDrop = '1';
+    const modal = ov.querySelector('.modal') || ov;
+    ov.addEventListener('dragover', e => {
+      if (e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files')) { e.preventDefault(); modal.style.outline = '3px dashed #2563eb'; }
+    });
+    ov.addEventListener('dragleave', e => { if (e.target === ov) modal.style.outline = ''; });
+    ov.addEventListener('drop', e => {
+      modal.style.outline = '';
+      const fs = e.dataTransfer && e.dataTransfer.files;
+      if (fs && fs.length && [...fs].some(f => /\.xml$/i.test(f.name))) { e.preventDefault(); nfeLerArquivos(fs); }
+    });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ligar); else ligar();
+})();
+
 
 function renderLancamentos() {
   if (!paginaVisivel('lancamentos')) return;
@@ -7467,89 +7998,505 @@ async function backupLancamentos() {
 }
 
 // ══════════════════════════════════════════
-// BACKUP AUTOMÁTICO DIÁRIO
-// Roda sozinho, 1x por dia, no primeiro login do admin que acontecer no
-// dia (usuários não-admin não disparam o backup). Busca todas as
-// tabelas direto do banco (não da memória do app) e baixa um .json no
-// navegador de quem abriu o sistema.
-// A data do último backup fica registrada na tabela config
-// (key = 'ultimo_backup_automatico'), para não gerar backup duplicado
-// no mesmo dia mesmo com múltiplos logins do admin.
+// BACKUP — tela própria (Administração → Backup)
+// • Pasta de destino escolhida pelo usuário (File System Access API —
+//   Chrome/Edge no computador). O "atalho" da pasta fica guardado no
+//   IndexedDB deste navegador. Sem pasta escolhida (ou em navegador sem
+//   suporte) o arquivo vai para a pasta Downloads, como antes.
+// • Período: cadastros vão sempre completos; as movimentações (compras,
+//   vendas, DFC, transferências, cartão, faturamento etc.) são filtradas
+//   pela data do lançamento. Registros sem data entram em qualquer período.
+// • Backup automático com frequência (diário/semanal/quinzenal/mensal).
+//   Roda quando um admin está com o sistema aberto. Configuração e
+//   histórico ficam na tabela config (keys backup_config / backup_historico
+//   / ultimo_backup_automatico).
+// Pelo console: gerarBackupCompleto()  → backup completo agora.
 // ══════════════════════════════════════════
 
-// Busca, direto do banco, todas as tabelas de dados do sistema.
-async function buscarDadosCompletos() {
-  const nomes = ['empresas','fornecedores','produtos','lancamentos','faturamento','recebimentos',
-    'metas','clientes','prodvenda','lancreceber','dfc_categorias','dfc_lancamentos',
-    'bancos','dre_grupos','transferencias','pedidos_cancelados','reposicoes'];
-  const results = await Promise.allSettled(nomes.map(t => fetchAll(t)));
-  const dados = {};
-  let algumaFalha = false;
-  nomes.forEach((nome, i) => {
-    if (results[i].status === 'fulfilled' && results[i].value !== null) {
-      dados[nome] = results[i].value;
-    } else {
-      dados[nome] = [];
-      algumaFalha = true;
-    }
+// [tabela, rótulo, campo de data] — campo null = cadastro (sempre completo)
+const BACKUP_TABELAS = [
+  ['empresas',          'Empresas',             null],
+  ['perfis',            'Perfis de usuário',    null],
+  ['fornecedores',      'Fornecedores',         null],
+  ['produtos',          'Produtos (compra)',    null],
+  ['clientes',          'Clientes',             null],
+  ['prodvenda',         'Produtos de venda',    null],
+  ['bancos',            'Bancos / caixas',      null],
+  ['cartoes',           'Cartões de crédito',   null],
+  ['dfc_categorias',    'Categorias DFC',       null],
+  ['dfc_subcategorias', 'Subcategorias DFC',    null],
+  ['dre_grupos',        'Grupos DRE',           null],
+  ['metas',             'Metas',                null],
+  ['config',            'Configurações',        null],
+  ['lancamentos',       'Lançamentos (compra)', 'dtcompra'],
+  ['lancreceber',       'Lançamentos (venda)',  'dtvenda'],
+  ['dfc_lancamentos',   'Lançamentos DFC',      'data'],
+  ['transferencias',    'Transferências',       'data'],
+  ['cartao_despesas',   'Despesas de cartão',   'data'],
+  ['faturamento',       'Faturamento',          'mes'],
+  ['recebimentos',      'Recebimentos',         'mes'],
+  ['pedidos_cancelados','Pedidos cancelados',   'dt_cancelamento'],
+  ['reposicoes',        'Reposições',           'dt_reposicao']
+];
+
+const BACKUP_PERIODOS = {
+  todos:        'Todos os dados',
+  mes_atual:    'Mês atual',
+  mes_anterior: 'Mês anterior',
+  ultimos_30:   'Últimos 30 dias',
+  ultimos_90:   'Últimos 90 dias',
+  ano_atual:    'Ano atual',
+  ano_anterior: 'Ano anterior',
+  personalizado:'Personalizado (de / até)'
+};
+const BACKUP_FREQS = { diario:'Diário', semanal:'Semanal', quinzenal:'Quinzenal', mensal:'Mensal' };
+const BACKUP_CFG_PADRAO = { auto: true, frequencia: 'diario', periodo: 'todos', subpasta: false };
+
+let _backupCfg = { ...BACKUP_CFG_PADRAO };
+let _backupRodando = false;
+let _backupPendente = null;   // backup automático gerado, aguardando permissão da pasta
+let _backupTimer = null;
+
+function _bkpEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function _bkIso(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function _bkFmtData(iso) { if (!iso) return ''; const [a,m,d] = iso.split('-'); return `${d}/${m}/${a}`; }
+
+// ── Pasta (IndexedDB guarda o handle da pasta neste navegador) ──
+function backupPastaSuportada() { return typeof window.showDirectoryPicker === 'function'; }
+function _bkIdb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('dana_backup', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('kv');
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
   });
-  return { dados, algumaFalha };
+}
+async function _bkIdbOp(modo, fn) {
+  const dbi = await _bkIdb();
+  return new Promise((res, rej) => {
+    const tx = dbi.transaction('kv', modo);
+    const req = fn(tx.objectStore('kv'));
+    tx.oncomplete = () => { dbi.close(); res(req && req.result); };
+    tx.onerror = () => { dbi.close(); rej(tx.error); };
+  });
+}
+async function backupObterPasta() {
+  if (!backupPastaSuportada()) return null;
+  try { return (await _bkIdbOp('readonly', s => s.get('pasta'))) || null; } catch(e) { return null; }
+}
+async function backupPermissaoPasta(h, pedir) {
+  const opts = { mode: 'readwrite' };
+  try {
+    if ((await h.queryPermission(opts)) === 'granted') return true;
+    if (!pedir) return false;
+    return (await h.requestPermission(opts)) === 'granted';
+  } catch(e) { return false; }
+}
+async function backupEscolherPasta() {
+  if (!backupPastaSuportada()) {
+    alert('Este navegador não permite escolher uma pasta.\nUse o Google Chrome ou o Microsoft Edge no computador. Enquanto isso, os backups vão para a pasta Downloads.');
+    return;
+  }
+  try {
+    const h = await window.showDirectoryPicker({ id: 'dana-backup', mode: 'readwrite' });
+    if (!(await backupPermissaoPasta(h, true))) { alert('Sem permissão para gravar nessa pasta.'); return; }
+    await _bkIdbOp('readwrite', s => s.put(h, 'pasta'));
+    renderBackupPasta();
+  } catch(e) {
+    if (e && e.name === 'AbortError') return; // usuário cancelou
+    console.error('[BACKUP] Erro ao escolher pasta:', e);
+    alert('Não foi possível usar essa pasta: ' + (e.message || e));
+  }
+}
+async function backupRemoverPasta() {
+  if (!confirm('Deixar de usar a pasta escolhida? Os próximos backups irão para a pasta Downloads.')) return;
+  try { await _bkIdbOp('readwrite', s => s.delete('pasta')); } catch(e) {}
+  renderBackupPasta();
+}
+async function backupAutorizarPasta() {
+  const h = await backupObterPasta();
+  if (h && await backupPermissaoPasta(h, true)) renderBackupPasta();
 }
 
-// Baixa o backup no navegador de quem estiver com o sistema aberto.
+// ── Período ──
+function backupResolverPeriodo(tipo, de, ate) {
+  const hoje = new Date();
+  const y = hoje.getFullYear(), m = hoje.getMonth();
+  let a = '', b = '';
+  switch (tipo) {
+    case 'mes_atual':    a = _bkIso(new Date(y, m, 1));   b = _bkIso(new Date(y, m + 1, 0)); break;
+    case 'mes_anterior': a = _bkIso(new Date(y, m - 1, 1)); b = _bkIso(new Date(y, m, 0)); break;
+    case 'ultimos_30':   a = _bkIso(new Date(y, m, hoje.getDate() - 29)); b = _bkIso(hoje); break;
+    case 'ultimos_90':   a = _bkIso(new Date(y, m, hoje.getDate() - 89)); b = _bkIso(hoje); break;
+    case 'ano_atual':    a = `${y}-01-01`; b = `${y}-12-31`; break;
+    case 'ano_anterior': a = `${y-1}-01-01`; b = `${y-1}-12-31`; break;
+    case 'personalizado': a = de || ''; b = ate || ''; break;
+    default: tipo = 'todos';
+  }
+  let rotulo = BACKUP_PERIODOS[tipo] || 'Todos os dados';
+  if (tipo !== 'todos') {
+    if (a && b) rotulo = `${_bkFmtData(a)} a ${_bkFmtData(b)}`;
+    else if (a) rotulo = `a partir de ${_bkFmtData(a)}`;
+    else if (b) rotulo = `até ${_bkFmtData(b)}`;
+    else { tipo = 'todos'; rotulo = 'Todos os dados'; }
+  }
+  return { tipo, de: a, ate: b, rotulo };
+}
+function _bkNormData(v) {
+  if (v == null || v === '') return '';
+  const s = String(v).trim();
+  let r;
+  if ((r = s.match(/^(\d{4})-(\d{2})-(\d{2})/))) return `${r[1]}-${r[2]}-${r[3]}`;
+  if ((r = s.match(/^(\d{4})-(\d{2})$/)))        return `${r[1]}-${r[2]}`;
+  if ((r = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/))) return `${r[3]}-${r[2]}-${r[1]}`;
+  return '';
+}
+function _bkDentroPeriodo(valor, per) {
+  const d = _bkNormData(valor);
+  if (!d) return true; // sem data → mantém (não perde nada)
+  if (d.length === 7) { // campo mês (AAAA-MM)
+    if (per.de && d < per.de.slice(0, 7)) return false;
+    if (per.ate && d > per.ate.slice(0, 7)) return false;
+    return true;
+  }
+  if (per.de && d < per.de) return false;
+  if (per.ate && d > per.ate) return false;
+  return true;
+}
+
+// ── Busca dos dados (direto do banco, não da memória do app) ──
+// Paginada; devolve null se alguma página falhar (para avisar no backup).
+async function _bkBuscarTabela(t) {
+  const limit = 1000;
+  let todas = [], off = 0;
+  // Ordena por id para a paginação não pular/repetir linhas; se a tabela não
+  // tiver coluna id, repete sem ordenação.
+  let ordem = '&order=id';
+  while (true) {
+    let lote = await sbFetch(t, 'GET', null, `?select=*${ordem}&limit=${limit}&offset=${off}`);
+    if (lote === null && off === 0 && ordem) { ordem = ''; lote = await sbFetch(t, 'GET', null, `?select=*&limit=${limit}&offset=0`); }
+    if (lote === null) return null;
+    todas = todas.concat(lote);
+    if (lote.length < limit) return todas;
+    off += limit;
+  }
+}
+async function buscarDadosCompletos(per, onProgresso) {
+  per = per || backupResolverPeriodo('todos');
+  const dados = {}, contagem = {}, falhas = [];
+  let feitas = 0;
+  await Promise.all(BACKUP_TABELAS.map(async ([t, rotulo, campo]) => {
+    let linhas = null;
+    try { linhas = await _bkBuscarTabela(t); } catch(e) { linhas = null; }
+    if (linhas === null) { falhas.push(rotulo); linhas = []; }
+    if (campo && per.tipo !== 'todos') linhas = linhas.filter(r => _bkDentroPeriodo(r[campo], per));
+    dados[t] = linhas;
+    contagem[t] = linhas.length;
+    feitas++;
+    if (onProgresso) onProgresso(feitas, BACKUP_TABELAS.length, rotulo);
+  }));
+  return { dados, contagem, falhas, algumaFalha: falhas.length > 0 };
+}
+
+async function montarBackup(per, tipo, onProgresso) {
+  const agora = new Date();
+  const { dados, contagem, falhas } = await buscarDadosCompletos(per, onProgresso);
+  const total = Object.values(contagem).reduce((s, n) => s + n, 0);
+  const hh = String(agora.getHours()).padStart(2,'0'), mi = String(agora.getMinutes()).padStart(2,'0');
+  const sufixo = per.tipo === 'todos' ? 'completo' : `${per.de || 'inicio'}_a_${per.ate || 'hoje'}`;
+  const nomeArquivo = `backup-dana-casa_${_bkIso(agora)}_${hh}h${mi}_${sufixo}.json`;
+  const conteudo = {
+    geradoEm: agora.toISOString(),
+    _backup: {
+      sistema: 'C@P Consultoria — Dana Casa', versao: 2, tipo,
+      geradoPor: currentUser ? (currentUser.nome || currentUser.user) : '',
+      periodo: per, totalRegistros: total, contagem, tabelasComFalha: falhas,
+      obs: 'Cadastros completos; movimentações filtradas pela data do lançamento.'
+    },
+    ...dados
+  };
+  return { nomeArquivo, json: JSON.stringify(conteudo, null, 2), total, contagem, falhas };
+}
+
+// Baixa o arquivo pelo navegador (pasta Downloads).
 function baixarBackupLocal(nomeArquivo, jsonString) {
   const blob = new Blob([jsonString], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = nomeArquivo;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  a.href = url; a.download = nomeArquivo;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// Gera o backup completo agora (busca dados + baixa local).
-// Pode ser rodada manualmente a qualquer momento pelo console: gerarBackupCompleto()
-async function gerarBackupCompleto() {
-  const agora = new Date();
-  const dataStr = today();
-  console.log('[BACKUP] Buscando dados completos do banco...');
-  const { dados, algumaFalha } = await buscarDadosCompletos();
-  if (algumaFalha) console.warn('[BACKUP] Uma ou mais tabelas falharam ao buscar. Backup gerado parcialmente.');
-
-  const conteudo = { geradoEm: agora.toISOString(), ...dados };
-  const jsonString = JSON.stringify(conteudo, null, 2);
-  const nomeArquivo = `backup-planetaflores-${dataStr}.json`;
-
-  baixarBackupLocal(nomeArquivo, jsonString);
-
-  console.log(`[BACKUP] Concluído. Arquivo baixado: ${nomeArquivo}${algumaFalha ? ' | Atenção: alguma tabela falhou ao buscar' : ''}.`);
-  return { nomeArquivo, algumaFalha };
+async function _bkGravarNaPasta(h, nome, json) {
+  let dir = h;
+  if (_backupCfg.subpasta) dir = await h.getDirectoryHandle(today().slice(0, 7), { create: true });
+  const fh = await dir.getFileHandle(nome, { create: true });
+  const w = await fh.createWritable();
+  await w.write(new Blob([json], { type: 'application/json' }));
+  await w.close();
+  return h.name + (_backupCfg.subpasta ? '/' + today().slice(0, 7) : '');
 }
 
-// Verifica se o backup automático de hoje já foi feito (por qualquer
-// usuário); se não, roda agora, silenciosamente (sem alert). Chamada
-// no carregamento do app (initApp).
-async function verificarBackupAutomatico() {
-  try {
-    const dataHoje = today();
-    const res = await sbFetch('config', 'GET', null, '?key=eq.ultimo_backup_automatico&limit=1');
-    const registro = (res && res[0]) ? JSON.parse(res[0].value) : null;
-    if (registro && registro.data === dataHoje) return; // já rodou hoje
-
-    const resultado = await gerarBackupCompleto();
-
-    await sbFetch('config', 'DELETE', null, '?key=eq.ultimo_backup_automatico');
-    await sbFetch('config', 'POST', {
-      id: uid(), key: 'ultimo_backup_automatico',
-      value: JSON.stringify({
-        data: dataHoje, ts: new Date().toISOString(), arquivo: resultado.nomeArquivo
-      })
-    });
-  } catch(e) {
-    console.error('[BACKUP] Erro na verificação do backup automático diário:', e);
+// Grava na pasta escolhida; sem pasta → Downloads.
+// interativo=false (automático): se o navegador pedir nova autorização da
+// pasta, devolve 'pendente' em vez de baixar (o usuário autoriza no aviso).
+async function backupSalvarArquivo(nome, json, interativo) {
+  const h = await backupObterPasta();
+  if (h) {
+    if (await backupPermissaoPasta(h, interativo)) {
+      try {
+        const local = await _bkGravarNaPasta(h, nome, json);
+        return { destino: 'pasta', local };
+      } catch(e) {
+        console.error('[BACKUP] Falha ao gravar na pasta:', e);
+        if (interativo) alert('Não foi possível gravar na pasta "' + h.name + '" (' + (e.message || e) + ').\nO arquivo será baixado para a pasta Downloads.');
+      }
+    } else if (!interativo) {
+      return { destino: 'pendente', local: h.name };
+    }
   }
+  baixarBackupLocal(nome, json);
+  return { destino: 'downloads', local: 'Downloads' };
+}
+
+// ── Configuração e histórico (tabela config) ──
+async function _bkConfigGet(key) {
+  const r = await sbFetch('config', 'GET', null, `?key=eq.${encodeURIComponent(key)}&limit=1`);
+  if (r === null) return undefined; // erro de leitura
+  try { return r[0] ? JSON.parse(r[0].value) : null; } catch(e) { return null; }
+}
+async function _bkConfigSet(key, valor) {
+  await sbFetch('config', 'DELETE', null, `?key=eq.${encodeURIComponent(key)}`);
+  return !!(await sbFetch('config', 'POST', { id: uid(), key, value: JSON.stringify(valor) }));
+}
+async function carregarBackupConfig() {
+  const c = await _bkConfigGet('backup_config');
+  _backupCfg = { ...BACKUP_CFG_PADRAO, ...(c || {}) };
+  return _backupCfg;
+}
+async function _bkRegistrar(entrada) {
+  const hist = (await _bkConfigGet('backup_historico')) || [];
+  hist.unshift(entrada);
+  await _bkConfigSet('backup_historico', hist.slice(0, 30));
+  if (entrada.tipo === 'automatico') {
+    await _bkConfigSet('ultimo_backup_automatico', { data: today(), ts: entrada.ts, arquivo: entrada.arquivo });
+  }
+}
+
+// ── Gerar backup manual (botão da tela) ──
+async function backupGerarAgora() {
+  if (_backupRodando) return;
+  const tipoPer = document.getElementById('bk-periodo').value;
+  const de = document.getElementById('bk-de').value, ate = document.getElementById('bk-ate').value;
+  if (tipoPer === 'personalizado' && !de && !ate) { alert('Informe a data inicial e/ou final do período.'); return; }
+  if (de && ate && de > ate) { alert('A data inicial é maior que a data final.'); return; }
+  const per = backupResolverPeriodo(tipoPer, de, ate);
+  const btn = document.getElementById('bk-btn-gerar');
+  const st = document.getElementById('bk-status');
+  _backupRodando = true; btn.disabled = true;
+  st.innerHTML = '<span style="color:#57534e">Buscando dados do banco...</span>';
+  try {
+    const b = await montarBackup(per, 'manual', (f, t, r) => { st.innerHTML = `<span style="color:#57534e">Buscando dados do banco... ${f}/${t} (${_bkpEsc(r)})</span>`; });
+    const sv = await backupSalvarArquivo(b.nomeArquivo, b.json, true);
+    await _bkRegistrar({ ts: new Date().toISOString(), tipo: 'manual', arquivo: b.nomeArquivo, periodo: per.rotulo,
+      destino: sv.local, registros: b.total, usuario: currentUser ? currentUser.nome : '', falhas: b.falhas });
+    const ondeTxt = sv.destino === 'pasta' ? `na pasta <b>${_bkpEsc(sv.local)}</b>` : 'na pasta <b>Downloads</b> do navegador';
+    st.innerHTML = `<div style="color:#166534;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 12px">
+      ✅ Backup salvo ${ondeTxt}: <span style="font-family:DM Mono,monospace;font-size:12px">${_bkpEsc(b.nomeArquivo)}</span><br>
+      ${b.total.toLocaleString('pt-BR')} registro(s) — período: ${_bkpEsc(per.rotulo)}
+      ${b.falhas.length ? `<br><span style="color:#b45309">⚠️ Não foi possível ler: ${_bkpEsc(b.falhas.join(', '))}</span>` : ''}</div>`;
+    renderBackupHistorico();
+  } catch(e) {
+    console.error('[BACKUP] Erro:', e);
+    st.innerHTML = `<span style="color:#dc2626">❌ Erro ao gerar o backup: ${_bkpEsc(e.message || e)}</span>`;
+  } finally {
+    _backupRodando = false; btn.disabled = false;
+  }
+}
+
+// Backup completo agora (pelo console, sem a tela).
+async function gerarBackupCompleto() {
+  const b = await montarBackup(backupResolverPeriodo('todos'), 'manual');
+  const sv = await backupSalvarArquivo(b.nomeArquivo, b.json, true);
+  console.log(`[BACKUP] ${b.nomeArquivo} → ${sv.local} (${b.total} registros)`);
+  return { nomeArquivo: b.nomeArquivo, algumaFalha: b.falhas.length > 0 };
+}
+
+// ── Backup automático ──
+function _bkDiasEntre(a, b) { return Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 86400000); }
+function backupEstaVencido(ultimaData, freq) {
+  if (!ultimaData) return true;
+  const hoje = today();
+  if (freq === 'mensal') return ultimaData.slice(0, 7) !== hoje.slice(0, 7);
+  const dias = { diario: 1, semanal: 7, quinzenal: 15 }[freq] || 1;
+  return _bkDiasEntre(ultimaData, hoje) >= dias;
+}
+function backupProximaData(ultimaData, freq) {
+  if (!ultimaData) return today();
+  const d = new Date(ultimaData + 'T12:00:00');
+  if (freq === 'mensal') return _bkIso(new Date(d.getFullYear(), d.getMonth() + 1, 1));
+  d.setDate(d.getDate() + ({ diario: 1, semanal: 7, quinzenal: 15 }[freq] || 1));
+  const p = _bkIso(d);
+  return p < today() ? today() : p;
+}
+
+async function verificarBackupAutomatico() {
+  if (_backupRodando || _backupPendente) return;
+  if (!currentUser || currentUser.role !== 'admin') return;
+  try {
+    await carregarBackupConfig();
+    if (!_backupCfg.auto) return;
+    const ultimo = await _bkConfigGet('ultimo_backup_automatico');
+    if (ultimo === undefined) return; // não conseguiu ler — tenta depois
+    if (!backupEstaVencido(ultimo && ultimo.data, _backupCfg.frequencia)) return;
+    _backupRodando = true;
+    const per = backupResolverPeriodo(_backupCfg.periodo);
+    const b = await montarBackup(per, 'automatico');
+    const sv = await backupSalvarArquivo(b.nomeArquivo, b.json, false);
+    const entrada = { ts: new Date().toISOString(), tipo: 'automatico', arquivo: b.nomeArquivo, periodo: per.rotulo,
+      destino: sv.local, registros: b.total, usuario: currentUser.nome, falhas: b.falhas };
+    if (sv.destino === 'pendente') {
+      _backupPendente = { ...b, entrada };
+      backupMostrarAvisoPendente(sv.local);
+    } else {
+      await _bkRegistrar(entrada);
+      if (paginaVisivel('backup')) renderBackupPage();
+    }
+  } catch(e) {
+    console.error('[BACKUP] Erro no backup automático:', e);
+  } finally {
+    _backupRodando = false;
+  }
+}
+function iniciarBackupAutomatico() {
+  setTimeout(() => { verificarBackupAutomatico().catch(e => console.error('[BACKUP] Falha inesperada:', e)); }, 3000);
+  if (_backupTimer) clearInterval(_backupTimer);
+  // Verifica de novo a cada 30 min (ex.: sistema aberto de um dia para o outro)
+  _backupTimer = setInterval(() => { verificarBackupAutomatico().catch(() => {}); }, 30 * 60 * 1000);
+}
+
+// Aviso quando o navegador exige reautorizar a pasta (acontece depois de
+// fechar e abrir o navegador — é uma regra de segurança do Chrome/Edge).
+function backupMostrarAvisoPendente(nomePasta) {
+  let el = document.getElementById('bk-aviso');
+  if (!el) { el = document.createElement('div'); el.id = 'bk-aviso'; document.body.appendChild(el); }
+  el.style.cssText = 'position:fixed;right:20px;bottom:20px;z-index:9998;background:#fff;border:1px solid #e7e5e4;border-left:4px solid #ea580c;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.18);padding:16px 18px;max-width:360px;font-size:13px;color:#1f2937';
+  el.innerHTML = `<div style="font-weight:700;margin-bottom:4px">💾 Backup automático pronto</div>
+    <div style="color:#57534e;margin-bottom:12px">Clique para salvar na pasta <b>${_bkpEsc(nomePasta)}</b>. O navegador pede essa confirmação depois de ser reaberto.</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-secondary btn-sm" onclick="backupConcluirPendente(false)">Baixar em Downloads</button>
+      <button class="btn btn-primary btn-sm" onclick="backupConcluirPendente(true)">Salvar na pasta</button></div>`;
+}
+async function backupConcluirPendente(naPasta) {
+  const p = _backupPendente;
+  if (!p) return;
+  let local = 'Downloads';
+  const h = naPasta ? await backupObterPasta() : null;
+  if (h && await backupPermissaoPasta(h, true)) {
+    try { local = await _bkGravarNaPasta(h, p.nomeArquivo, p.json); }
+    catch(e) { console.error('[BACKUP] Falha ao gravar na pasta:', e); baixarBackupLocal(p.nomeArquivo, p.json); local = 'Downloads'; }
+  } else {
+    baixarBackupLocal(p.nomeArquivo, p.json);
+  }
+  _backupPendente = null;
+  const el = document.getElementById('bk-aviso'); if (el) el.remove();
+  await _bkRegistrar({ ...p.entrada, destino: local });
+  if (paginaVisivel('backup')) renderBackupPage();
+}
+
+// ── Tela ──
+async function renderBackupPasta() {
+  const box = document.getElementById('bk-pasta-info');
+  if (!box) return;
+  if (!backupPastaSuportada()) {
+    box.innerHTML = `<div class="bk-pasta-nome">📥 Downloads</div><div class="bk-nota">Este navegador não permite escolher pasta. Para isso, abra o sistema no Google Chrome ou Microsoft Edge no computador.</div>`;
+    document.getElementById('bk-btn-pasta').style.display = 'none';
+    document.getElementById('bk-btn-rem-pasta').style.display = 'none';
+    return;
+  }
+  const h = await backupObterPasta();
+  document.getElementById('bk-btn-pasta').textContent = h ? '📁 Trocar pasta' : '📁 Escolher pasta';
+  document.getElementById('bk-btn-rem-pasta').style.display = h ? '' : 'none';
+  if (!h) {
+    box.innerHTML = `<div class="bk-pasta-nome">📥 Downloads <span class="badge badge-gray">padrão</span></div><div class="bk-nota">Nenhuma pasta escolhida — os arquivos vão para a pasta Downloads do navegador.</div>`;
+    return;
+  }
+  const ok = await backupPermissaoPasta(h, false);
+  box.innerHTML = `<div class="bk-pasta-nome">📁 ${_bkpEsc(h.name)} ${ok ? '<span class="badge badge-green">autorizada</span>' : '<span class="badge badge-yellow">precisa autorizar</span>'}</div>
+    <div class="bk-nota">${ok ? 'Os backups serão gravados nesta pasta.' : 'O navegador foi reaberto e pede confirmação para gravar na pasta. <a href="#" onclick="backupAutorizarPasta();return false" style="color:#ea580c;font-weight:600">Autorizar agora</a>'}</div>
+    <div class="bk-nota">A pasta fica guardada só neste computador/navegador.</div>`;
+}
+async function renderBackupHistorico() {
+  const box = document.getElementById('bk-historico');
+  if (!box) return;
+  const hist = (await _bkConfigGet('backup_historico')) || [];
+  if (!hist.length) { box.innerHTML = '<div class="empty-state" style="padding:24px">Nenhum backup registrado ainda.</div>'; return; }
+  box.innerHTML = `<div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Tipo</th><th>Período</th><th>Registros</th><th>Salvo em</th><th>Arquivo</th><th>Por</th></tr></thead><tbody>
+    ${hist.map(h => `<tr>
+      <td style="white-space:nowrap">${_bkpEsc(fmtTs(h.ts))}</td>
+      <td>${h.tipo === 'automatico' ? '<span class="badge badge-blue">Automático</span>' : '<span class="badge badge-gray">Manual</span>'}</td>
+      <td>${_bkpEsc(h.periodo)}</td>
+      <td>${Number(h.registros || 0).toLocaleString('pt-BR')}${h.falhas && h.falhas.length ? ` <span title="Não lidas: ${_bkpEsc(h.falhas.join(', '))}">⚠️</span>` : ''}</td>
+      <td>${_bkpEsc(h.destino)}</td>
+      <td style="font-family:DM Mono,monospace;font-size:11px;color:#57534e">${_bkpEsc(h.arquivo)}</td>
+      <td>${_bkpEsc(h.usuario)}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+async function renderBackupAutoInfo() {
+  const el = document.getElementById('bk-auto-info');
+  if (!el) return;
+  if (!_backupCfg.auto) { el.innerHTML = 'Backup automático desligado.'; return; }
+  const ultimo = await _bkConfigGet('ultimo_backup_automatico');
+  const ud = ultimo && ultimo.data;
+  el.innerHTML = `Último automático: <b>${ud ? _bkFmtData(ud) : 'nenhum'}</b> · Próximo: <b>${_bkFmtData(backupProximaData(ud, _backupCfg.frequencia))}</b><br>
+    <span style="color:#a8a29e">Roda quando um admin estiver com o sistema aberto.</span>`;
+}
+function backupAtualizarCamposPeriodo() {
+  const p = document.getElementById('bk-periodo').value;
+  document.getElementById('bk-datas').style.display = p === 'personalizado' ? '' : 'none';
+  const prev = document.getElementById('bk-periodo-prev');
+  if (p === 'personalizado') { prev.textContent = ''; return; }
+  const per = backupResolverPeriodo(p);
+  prev.textContent = per.tipo === 'todos' ? 'Todos os registros, sem filtro de data.' : `Movimentações de ${_bkFmtData(per.de)} a ${_bkFmtData(per.ate)}.`;
+}
+async function backupSalvarConfig() {
+  _backupCfg = {
+    auto: document.getElementById('bk-auto').checked,
+    frequencia: document.getElementById('bk-freq').value,
+    periodo: document.getElementById('bk-auto-periodo').value,
+    subpasta: document.getElementById('bk-subpasta').checked
+  };
+  ['bk-freq','bk-auto-periodo'].forEach(id => document.getElementById(id).disabled = !_backupCfg.auto);
+  const ok = await _bkConfigSet('backup_config', _backupCfg);
+  const msg = document.getElementById('bk-cfg-msg');
+  msg.textContent = ok ? '✓ Salvo' : '❌ Erro ao salvar';
+  msg.style.color = ok ? '#16a34a' : '#dc2626';
+  setTimeout(() => { msg.textContent = ''; }, 2500);
+  renderBackupAutoInfo();
+}
+async function renderBackupPage() {
+  if (!document.getElementById('page-backup')) return;
+  const optsPer = Object.entries(BACKUP_PERIODOS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+  const selPer = document.getElementById('bk-periodo');
+  if (!selPer.options.length) {
+    selPer.innerHTML = optsPer;
+    document.getElementById('bk-auto-periodo').innerHTML = optsPer.replace(/<option value="personalizado">[^<]*<\/option>/, '');
+    document.getElementById('bk-freq').innerHTML = Object.entries(BACKUP_FREQS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+    document.getElementById('bk-ate').value = today();
+    document.getElementById('bk-de').value = today().slice(0, 8) + '01';
+  }
+  backupAtualizarCamposPeriodo();
+  document.getElementById('bk-tabelas').textContent = BACKUP_TABELAS.map(t => t[1]).join(' · ');
+  renderBackupPasta();
+  await carregarBackupConfig();
+  document.getElementById('bk-auto').checked = !!_backupCfg.auto;
+  document.getElementById('bk-freq').value = _backupCfg.frequencia;
+  document.getElementById('bk-auto-periodo').value = _backupCfg.periodo;
+  document.getElementById('bk-subpasta').checked = !!_backupCfg.subpasta;
+  ['bk-freq','bk-auto-periodo'].forEach(id => document.getElementById(id).disabled = !_backupCfg.auto);
+  renderBackupAutoInfo();
+  renderBackupHistorico();
 }
 
 async function estornarPago(id, parcIdx) {
@@ -9480,6 +10427,7 @@ function applyNavPermissions() {
     if (!match) return;
     const pg = match[1];
     if (pg === 'usuarios' || pg === 'empresas') return;
+    if (pg === 'backup') { item.style.display = isAdmin ? '' : 'none'; return; }
     if (isAdmin) { item.style.display = ''; return; }
     item.style.display = allowed.includes(pg) ? '' : 'none';
   });
@@ -14755,11 +15703,10 @@ async function initApp() {
   setTimeout(carregarJurosGlobal, 200);
   aplicarFiltrosPadraoMesAno();
   applyNavPermissions();
-  // Backup automático diário: roda em segundo plano, sem travar a tela
-  // nem avisar o usuário; só baixa algo se ainda não tiver rodado hoje.
-  // Restrito ao usuário admin (outros perfis não disparam o backup).
+  // Backup automático (frequência, período e pasta configurados em
+  // Administração → Backup). Roda em segundo plano, só para admin.
   if (currentUser && currentUser.role === 'admin') {
-    setTimeout(() => { verificarBackupAutomatico().catch(e => console.error('[BACKUP] Falha inesperada:', e)); }, 3000);
+    iniciarBackupAutomatico();
   }
 }
 
